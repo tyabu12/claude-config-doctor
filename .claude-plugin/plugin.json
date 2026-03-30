@@ -4,5 +4,8 @@
   "version": "1.0.0",
   "author": {
     "name": "tyabu12"
-  }
+  },
+  "repository": "https://github.com/tyabu12/claude-config-doctor",
+  "license": "MIT",
+  "keywords": ["config", "validation", "health check", "linter", "consistency"]
 }
