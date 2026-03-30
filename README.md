@@ -90,6 +90,8 @@ When installed manually, the command is `/config-doctor` instead of `/config-doc
 
 ## Usage
 
+> **Tip**: Run `/insights` before a full check to refresh session data for the most accurate results.
+
 ```
 # Recommended monthly: full check (best practices search, `/insights` report analysis)
 /config-doctor:check

@@ -91,6 +91,8 @@ curl -fsSL https://raw.githubusercontent.com/tyabu12/claude-config-doctor/main/s
 
 ## 使い方
 
+> **Tip**: フルチェックの前に `/insights` を実行して最新のセッションデータに更新してください。より正確な結果が得られます。
+
 ```
 # 月1回想定: フルチェック（ベストプラクティス検索、`/insights` レポート分析）
 /config-doctor:check
