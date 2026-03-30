@@ -66,8 +66,11 @@ Running full config-doctor health check. Let me gather the initial context.
 
 ## Installation
 
-```bash
-claude plugin add github:tyabu12/claude-config-doctor
+Add the marketplace and install the plugin.
+
+```shell
+/plugin marketplace add tyabu12/claude-config-doctor
+/plugin install config-doctor@tyabu12-claude-config-doctor
 ```
 
 <details>
@@ -130,7 +133,7 @@ Because this skill reads local session data, it is designed with security in min
 - Full mode also searches for the latest best practices, so it uses `WebSearch`, `WebFetch`, and `Agent` tools (sections 7-8). `light` mode uses only `Read`, `Glob`, `Grep`, `Bash`, and `Agent`
 - **Read-only** — never modifies any configuration files. No auto-fix functionality
 - **Execution time**: Full review takes about 5 minutes. `light` mode is faster but skips best practices search and `/insights` report analysis
-- **Uninstall**: `claude plugin remove config-doctor` (or delete `.claude/skills/config-doctor/` if installed manually)
+- **Uninstall**: `/plugin uninstall config-doctor@tyabu12-claude-config-doctor` (or delete `.claude/skills/config-doctor/` if installed manually)
 
 ## Contributing
 

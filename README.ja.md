@@ -67,8 +67,11 @@ Running full config-doctor health check. Let me gather the initial context.
 
 ## インストール
 
-```bash
-claude plugin add github:tyabu12/claude-config-doctor
+marketplace を追加してプラグインをインストールしてください。
+
+```shell
+/plugin marketplace add tyabu12/claude-config-doctor
+/plugin install config-doctor@tyabu12-claude-config-doctor
 ```
 
 <details>
@@ -132,7 +135,7 @@ FAIL 項目はサンドボックス化されたサブエージェントによる
 - Full モードは最新のベストプラクティスも検索するため `WebSearch`、`WebFetch`、`Agent` ツールも使用します（セクション 7-8）。`light` モードは `Read`、`Glob`、`Grep`、`Bash`、`Agent` のみです
 - **読み取り専用** — 設定ファイルを一切変更しません。自動修正機能もありません
 - **実行時間**: Full レビューは5分程度かかります。`light` モードはより高速ですが最新のベストプラクティスの検索と `/insights` レポートの分析をスキップします
-- **アンインストール**: `claude plugin remove config-doctor`（手動インストールの場合は `.claude/skills/config-doctor/` を削除）
+- **アンインストール**: `/plugin uninstall config-doctor@tyabu12-claude-config-doctor`（手動インストールの場合は `.claude/skills/config-doctor/` を削除）
 
 ## コントリビュート
 

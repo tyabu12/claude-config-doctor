@@ -1,0 +1,16 @@
+{
+  "name": "tyabu12-claude-config-doctor",
+  "owner": {
+    "name": "tyabu12"
+  },
+  "metadata": {
+    "description": "Marketplace for claude-config-doctor plugin"
+  },
+  "plugins": [
+    {
+      "name": "config-doctor",
+      "source": "./",
+      "description": "Health check for Claude Code configuration files. Validates CLAUDE.md, rules, commands, skills, agents, hooks, settings, and cross-file consistency."
+    }
+  ]
+}
