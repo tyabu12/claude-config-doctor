@@ -20,9 +20,24 @@ config-doctor uses a Claude Code skill to inspect what they can't.
 | **Insights integration** (friction patterns → config recommendations) | ❌ | ✅ |
 | **Best practices sync** (fetches latest official docs at runtime) | ❌ | ✅ |
 
-For security reasons, this skill is strictly read-only. it only outputs a report and never modifies any files.
+### Difference from claude-md-management
 
-To act on findings, pass the Recommended Actions to Claude Code or fix them manually.
+Anthropic's official [claude-md-management](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-md-management) is a plugin dedicated to improving the quality of CLAUDE.md files.
+
+| | config-doctor | claude-md-management |
+| --- | --- | --- |
+| Scope | **All** config files (CLAUDE.md / rules / commands / skills / agents / hooks / settings) | **CLAUDE.md only** |
+| Purpose | Health check & cross-file consistency validation | Quality audit, improvement & session learning capture |
+| Read / Write | **Read-only** (report output only) | **Read + Edit** (modifies files after user approval) |
+| Components | 1 skill (`/config-doctor:check`) | 1 skill + 1 command (`/revise-claude-md`) |
+
+The two are complementary, not competing. Use config-doctor to **diagnose** your entire configuration, and claude-md-management to **improve** your CLAUDE.md files.
+
+---
+
+For security reasons, this skill is strictly read-only — it only outputs a report and never modifies any files.
+
+If the findings look reasonable, just type something like "update my config based on these findings" into the prompt and Claude Code will optimize your configuration for you. Easy!
 
 ### Sample output
 

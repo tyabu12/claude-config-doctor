@@ -20,10 +20,25 @@ config-doctor は ClaudeCode のスキルを使うことで、その先を検査
 | **Insights 統合**（friction パターン → 設定改善提案） | ❌ | ✅ |
 | **ベストプラクティス同期**（実行時に最新の公式ドキュメントを取得） | ❌ | ✅ |
 
+### claude-md-management との違い
+
+Anthropic 公式の [claude-md-management](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-md-management) は CLAUDE.md の品質改善に特化したプラグインです。
+
+| | config-doctor | claude-md-management |
+| --- | --- | --- |
+| 対象範囲 | 設定ファイル**全体**（CLAUDE.md / rules / commands / skills / agents / hooks / settings） | **CLAUDE.md のみ** |
+| 目的 | 健全性チェック・クロスファイル整合性検証 | 品質監査・改善・セッション学習の反映 |
+| 読み取り/書き込み | **読み取り専用**（レポート出力のみ） | **読み取り+編集**（ユーザー承認後に修正） |
+| 提供機能 | スキル 1 つ（`/config-doctor:check`） | スキル 1 つ + コマンド 1 つ（`/revise-claude-md`） |
+
+両者は競合ではなく補完関係にあります。config-doctor で設定全体を**診断**し、claude-md-management で CLAUDE.md を**改善**する使い方が効果的です。
+
+---
+
 なおこのスキルはセキュリティ上の観点から、レポートを出力するだけなので読み取り専用になっています。
 ファイルは一切変更されません。
 
-指摘事項を修正するには、Recommended Actions を Claude Code に渡すか、手動で対応してください。
+診断結果が問題なさそうであれば、「指摘を元に設定を更新して」とそのままプロンプトに打てばあとは Claude Code がいい感じに設定を最適化してくれます。簡単ですね！
 
 ### 出力例
 
