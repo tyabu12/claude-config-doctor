@@ -85,8 +85,14 @@ Running full config-doctor health check. Let me gather the initial context.
 marketplace を追加してプラグインをインストールしてください。
 
 ```shell
+# マーケットプレイスを追加
 /plugin marketplace add tyabu12/claude-config-doctor
+
+# プラグインをインストール
 /plugin install config-doctor@tyabu12-claude-config-doctor
+
+# プラグインをリロードして有効化
+/reload-plugins
 ```
 
 <details>

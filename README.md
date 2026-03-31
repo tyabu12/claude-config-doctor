@@ -84,8 +84,14 @@ Running full config-doctor health check. Let me gather the initial context.
 Add the marketplace and install the plugin.
 
 ```shell
+# add marketplace
 /plugin marketplace add tyabu12/claude-config-doctor
+
+# install
 /plugin install config-doctor@tyabu12-claude-config-doctor
+
+# reload to activate
+/reload-plugins
 ```
 
 <details>
