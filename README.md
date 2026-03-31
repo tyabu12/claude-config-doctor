@@ -4,7 +4,7 @@
 
 A [skill](https://code.claude.com/docs/en/skills) that health-checks your Claude Code configuration files.
 
-It goes beyond structural linting — detecting semantic conflicts across CLAUDE.md, rules, commands, skills, hooks, and settings.
+It goes beyond structural linting — detecting semantic conflicts across CLAUDE.md, rules, commands, skills, hooks, and settings. Also supports [plugin](https://code.claude.com/docs/en/plugins) projects (manifest validation, directory structure, cross-component consistency, and more).
 
 ## Why config-doctor
 
@@ -301,7 +301,9 @@ When installed manually, the command is `/config-doctor` instead of `/config-doc
 
 ## What it checks
 
-The skill consists of the following 9 review sections.
+The skill automatically detects the project type and runs the appropriate diagnostics.
+
+### Standard projects (`.claude/` configuration)
 
 | Section | What it checks |
 | --- | --- |
@@ -314,6 +316,20 @@ The skill consists of the following 9 review sections.
 | 6. Cross-file | JSON validity, permission conflicts, hook-permission alignment |
 | 7. Best Practices | Fetches latest Anthropic docs at runtime and compares against your config |
 | 8. Insights | Aggregates `/insights` friction data into actionable config fixes |
+
+### Plugin projects (`.claude-plugin/plugin.json`)
+
+| Section | What it checks |
+| --- | --- |
+| 0. Manifest | JSON syntax, required fields, name format, version, metadata, userConfig, channels |
+| 1. Directory Structure | Anti-patterns, component directories, README, path traversal, stray `.claude/` |
+| 2. Skills | SKILL.md existence, frontmatter, description, tool permissions, `$ARGUMENTS`, `${CLAUDE_PLUGIN_ROOT}` |
+| 3. Commands | Frontmatter, description, tool permissions, legacy overlap with skills |
+| 4. Agents | Required fields, supported fields, model, tools, isolation, security restrictions |
+| 5. Hooks | hooks.json syntax, event names, handler structure, script portability, orphan scripts |
+| 6. MCP & LSP | JSON syntax, server entries, portability, channel references, extension format |
+| 7. Cross-Component | Skill↔Agent refs, hook→script refs, channel→MCP refs, namespace conflicts |
+| 8. Best Practices | Fetches latest Anthropic plugin docs at runtime and compares against your config |
 
 FAIL items are cross-reviewed by a sandboxed subagent (max 1 iteration) before the final report.
 

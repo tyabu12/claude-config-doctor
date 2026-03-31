@@ -4,7 +4,7 @@
 
 Claude Code の設定ファイル群のヘルスチェックを行う[スキル](https://code.claude.com/docs/ja/skills)です。
 
-構造的な lint にとどまらず、CLAUDE.md / rules / commands / skills / hooks / settings 間の意味的な矛盾を検出します。
+構造的な lint にとどまらず、CLAUDE.md / rules / commands / skills / hooks / settings 間の意味的な矛盾を検出します。[プラグイン](https://code.claude.com/docs/en/plugins)プロジェクト（マニフェスト検証、ディレクトリ構造、コンポーネント間整合性など）にも対応しています。
 
 ## なぜ config-doctor か
 
@@ -302,7 +302,9 @@ curl -fsSL https://raw.githubusercontent.com/tyabu12/claude-config-doctor/main/s
 
 ## チェック内容
 
-スキルは下記の9つのレビューセクションからなります。
+プロジェクトの種類を自動検出し、適切な診断を実行します。
+
+### 通常プロジェクト（`.claude/` 設定）
 
 | セクション | チェック内容 |
 | --- | --- |
@@ -315,6 +317,20 @@ curl -fsSL https://raw.githubusercontent.com/tyabu12/claude-config-doctor/main/s
 | 6. Cross-file | JSON の妥当性、権限の矛盾、hook と permission の整合性 |
 | 7. Best Practices | 実行時に最新の Anthropic 公式ドキュメントを取得し、設定と比較 |
 | 8. Insights | `/insights` の friction データを集約し、設定改善を提案 |
+
+### プラグインプロジェクト（`.claude-plugin/plugin.json`）
+
+| セクション | チェック内容 |
+| --- | --- |
+| 0. Manifest | JSON 構文、必須フィールド、名前形式、バージョン、メタデータ、userConfig、channels |
+| 1. Directory Structure | アンチパターン、コンポーネントディレクトリ、README、パストラバーサル、`.claude/` の混在 |
+| 2. Skills | SKILL.md の存在、frontmatter、description、ツール権限、`$ARGUMENTS`、`${CLAUDE_PLUGIN_ROOT}` |
+| 3. Commands | Frontmatter、description、ツール権限、skills との重複 |
+| 4. Agents | 必須フィールド、対応フィールド、model、tools、isolation、セキュリティ制約 |
+| 5. Hooks | hooks.json 構文、イベント名、ハンドラ構造、スクリプトのポータビリティ、孤立スクリプト |
+| 6. MCP & LSP | JSON 構文、サーバエントリ、ポータビリティ、channel 参照、拡張子形式 |
+| 7. Cross-Component | Skill↔Agent 参照、hook→script 参照、channel→MCP 参照、名前空間の競合 |
+| 8. Best Practices | 実行時に最新の Anthropic プラグインドキュメントを取得し、設定と比較 |
 
 FAIL 項目はサンドボックス化されたサブエージェントによるクロスレビュー（最大1回）を経て、最終レポートに反映されます。
 
