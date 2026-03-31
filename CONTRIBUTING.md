@@ -29,8 +29,9 @@ Note: Sections 7-8 are advisory-only (they never produce FAIL). New sections sho
 1. Fork the repository
 2. Create a branch (`git checkout -b improve-section-5`)
 3. Make your changes to `SKILL.md`
-4. Test by running `claude --plugin-dir /path/to/claude-config-doctor` in a real project and executing `/config-doctor:check`
-5. Open a PR with a clear description of what changed and why
+4. Run `/self-check` and confirm all checks PASS
+5. Test by running `claude --plugin-dir /path/to/claude-config-doctor` in a real project and executing `/config-doctor:check`
+6. Open a PR with a clear description of what changed and why
 
 ## Guidelines
 
