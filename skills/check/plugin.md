@@ -2,7 +2,7 @@
 
 This file defines the diagnostic procedure for Claude Code plugin projects.
 It is read by the main SKILL.md after project type detection.
-All shared constraints, definitions, and the Review Loop are defined in reference.md.
+Valid tool, model, and effort lists are defined in reference.md.
 
 This check always runs in full mode — there is no `light` option.
 
@@ -29,19 +29,20 @@ Read `.claude-plugin/plugin.json` and check:
 - [ ] **Component path overrides**: If any of `commands`, `agents`, `skills`, `hooks`, `mcpServers`, `outputStyles`, `lspServers` are specified, verify the referenced paths exist on disk. Note: these override the default directory locations.
 - [ ] **userConfig**: If present, verify it is an object where each key maps to an object with at least `description` (string). Check `sensitive` field is boolean if present.
 - [ ] **channels**: If present, verify each entry has a `server` field that matches a key in the plugin's MCP server configuration.
-- [ ] **settings.json**: If `settings.json` exists at the plugin root, note its presence — this provides default configuration when the plugin is enabled. Verify it is valid JSON.
+- [ ] **settings.json**: If `settings.json` exists at the plugin root, note its presence — this provides default configuration when the plugin is enabled. Verify it is valid JSON. If an `agent` key is present, verify the referenced agent exists in the plugin's `agents/` directory (or custom agents path from manifest). Flag unknown keys as WARN (currently only `agent` is supported; unknown keys are silently ignored).
 - [ ] **Unknown fields**: Flag any top-level fields not in the known schema as WARN (possible typo or future field).
 
 ### 1. Directory Structure Validation
 
 Check that the plugin follows the standard directory layout:
 
-- [ ] **Anti-pattern check**: Verify that `commands/`, `agents/`, `skills/`, `hooks/` directories are NOT inside `.claude-plugin/`. Only `plugin.json` belongs in `.claude-plugin/`. This is a common mistake explicitly warned against in official documentation. Flag as FAIL.
+- [ ] **Anti-pattern check**: Verify that `commands/`, `agents/`, `skills/`, `hooks/`, `output-styles/` directories are NOT inside `.claude-plugin/`. Only `plugin.json` belongs in `.claude-plugin/`. This is a common mistake explicitly warned against in official documentation. Flag as FAIL.
 - [ ] **Component directories at root**: For each component type, check if the directory exists at the expected location (root level or custom path from manifest):
   - `skills/` — skill directories with `SKILL.md`
   - `commands/` — command markdown files (legacy; `skills/` preferred for new skills)
   - `agents/` — agent markdown files
   - `hooks/` — hook configuration (`hooks.json`)
+  - `output-styles/` — output style definition files
   - `.mcp.json` — MCP server definitions (root level)
   - `.lsp.json` — LSP server definitions (root level)
 - [ ] **README.md**: Verify a `README.md` exists at the plugin root. Flag absence as WARN (recommended for documentation).
@@ -73,7 +74,7 @@ For each skill directory:
   - `hooks` contains valid hook configuration structure
 - [ ] **Supporting files**: If the skill's `SKILL.md` references supporting files (e.g., `reference.md`, `scripts/`, `examples/`), verify they exist within the skill directory.
 - [ ] **$ARGUMENTS usage**: If `argument-hint` is defined, verify the skill content references `$ARGUMENTS`.
-- [ ] **Script references**: If the skill references scripts, verify they use `${CLAUDE_PLUGIN_ROOT}` for paths (not hardcoded absolute paths). This ensures scripts work after plugin installation.
+- [ ] **Script references**: If the skill references scripts, verify they use `${CLAUDE_PLUGIN_ROOT}` or `${CLAUDE_PLUGIN_DATA}` for paths (not hardcoded absolute paths). This ensures scripts work after plugin installation.
 
 ### 3. Commands Validation
 
@@ -111,13 +112,13 @@ For each `.md` file in `agents/`:
 If neither `hooks/hooks.json` nor inline hooks in `plugin.json` exist, AND `hooks/` directory does not exist or is empty, mark SKIPPED.
 
 - [ ] **hooks.json syntax**: If `hooks/hooks.json` exists, verify it is valid JSON.
-- [ ] **Hook event names**: Verify all hook event keys are recognized event names: `PreToolUse`, `PostToolUse`, `Stop`, `SessionStart`, `Notification`, `UserPromptSubmit`, `SubagentStop`, `ConfigChange`, and any other documented events. Flag unrecognized event names as WARN.
+- [ ] **Hook event names**: Verify all hook event keys are recognized event names (see reference.md for the valid set).
 - [ ] **Handler structure**: For each hook handler, verify:
   - `type` field is present and is one of: `command`, `http`, `prompt`, `agent`
   - `matcher` field (if present) is a valid regex string
 - [ ] **Command handlers**: For `type: command` handlers:
   - Verify the referenced script path exists
-  - Check scripts use `${CLAUDE_PLUGIN_ROOT}` for paths (not hardcoded absolute paths) — critical for plugin portability
+  - Check scripts use `${CLAUDE_PLUGIN_ROOT}` or `${CLAUDE_PLUGIN_DATA}` for paths (not hardcoded absolute paths) — critical for plugin portability
   - Verify scripts are executable (if on a Unix-like system)
 - [ ] **HTTP handlers**: For `type: http` handlers, verify the URL is well-formed.
 - [ ] **Inline hooks in plugin.json**: If `plugin.json` contains a `hooks` field (inline format), apply the same checks as above.

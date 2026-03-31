@@ -2,7 +2,7 @@
 
 This file defines the diagnostic procedure for standard Claude Code projects (non-plugin).
 It is read by the main SKILL.md after project type detection.
-All shared constraints, definitions, and the Review Loop are defined in reference.md.
+Valid tool, model, and effort lists are defined in reference.md.
 
 ## Pre-Procedure Setup
 
@@ -108,7 +108,7 @@ For each other skill directory in `.claude/skills/`:
   - `paths` glob patterns match at least one existing file (Glob)
   - `disable-model-invocation` is a boolean value
   - `user-invocable` is a boolean value
-  - `hooks` contains valid hook configuration structure (keys match known hook event names; handler objects have required `type` field). Flag malformed structure as FAIL. Note: detailed hook logic validation (script content, URL safety, matcher patterns) is performed in Section 5 — see "Skill/agent frontmatter hooks" there
+  - `hooks` contains valid hook configuration structure (keys match known hook event names per reference.md; handler objects have required `type` field). Flag malformed structure as FAIL. Note: detailed hook logic validation (script content, URL safety, matcher patterns) is performed in Section 5 — see "Skill/agent frontmatter hooks" there
   - `shell` is `bash` or `powershell`
   - `name` contains only lowercase letters, numbers, and hyphens (max 64 characters)
 - [ ] **Procedure accuracy**: Verify that files and paths referenced in the skill content actually exist.
@@ -148,7 +148,7 @@ For each hook configuration found:
 - [ ] **PostToolUse hooks**: Verify any auto-formatting or linting commands use correct flags matching the project's CI expectations.
 - [ ] **SessionStart hooks**: If present, verify the reminder message accurately reflects current rules in CLAUDE.md.
 - [ ] **settings.local.json**: Check for conflicts or duplications with shared settings. Do NOT include environment variable values or secrets in the report — only note the presence of env configuration and whether keys conflict.
-- [ ] **All hook types**: Check all hook types found in settings files (PreToolUse, PostToolUse, Stop, SessionStart, Notification, etc.) — do not assume a fixed list.
+- [ ] **All hook types**: Check all hook event types found in settings files against the valid set in reference.md.
 - [ ] **Skill/agent frontmatter hooks**: If any skill (`SKILL.md`) or agent (`.claude/agents/*.md`) defines a `hooks` field in frontmatter, apply the same handler-type checks above (matcher correctness, command script logic, HTTP URL validation, etc.).
 
 ### 6. Cross-File Consistency
