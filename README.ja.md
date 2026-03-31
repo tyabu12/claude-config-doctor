@@ -108,13 +108,252 @@ curl -fsSL https://raw.githubusercontent.com/tyabu12/claude-config-doctor/main/s
 
 > **Tip**: フルチェックの前に `/insights` を実行して最新のセッションデータに更新してください。より正確な結果が得られます。
 
-```
+```sh
 # 月1回想定: フルチェック（ベストプラクティス検索、`/insights` レポート分析）
 /config-doctor:check
 
 # ライトモード: 構造チェックのみ
 /config-doctor:check light
 ```
+
+<details>
+<summary>ドッグフーディング: /config-doctor:check</summary>
+
+```shell
+❯ /config-doctor:check
+
+⏺ Bash(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null | sed 's|/\.git$||')
+  ⎿  /Users/tyabu12/Work/claude-config-doctor
+
+⏺ Bash(basename /Users/tyabu12/Work/claude-config-doctor)
+  ⎿  claude-config-doctor
+
+⏺ Now let me read the key configuration files in parallel.
+
+  Searched for 5 patterns, read 6 files (ctrl+o to expand)
+
+⏺ Now let me check for insights data and run the best practices searches.
+
+  Searched for 1 pattern (ctrl+o to expand)
+
+⏺ Let me validate the insights schema, find matching sessions, and run the best practices searches in parallel.
+
+  Searched for 2 patterns, read 1 file (ctrl+o to expand)
+
+⏺ Web Search("site:code.claude.com CLAUDE.md")
+  ⎿  Did 1 search in 7s
+
+⏺ Web Search("site:code.claude.com hooks")
+  ⎿  Did 1 search in 6s
+
+⏺ Web Search("site:code.claude.com commands")
+  ⎿  Did 1 search in 7s
+
+⏺ Web Search("site:code.claude.com skills")
+  ⎿  Did 1 search in 7s
+
+⏺ Web Search("site:platform.claude.com Claude Code configuration")
+  ⎿  Did 1 search in 6s
+
+⏺ Web Search("site:anthropic.com/engineering Claude Code")
+  ⎿  Did 1 search in 9s
+
+⏺ No sessions matched this project for insights. Let me fetch a couple of key documentation pages for Section 7 advisory recommendations.
+
+⏺ Fetch(https://code.claude.com/docs/en/memory)
+  ⎿  Received 24.4KB (200 OK)
+
+⏺ Fetch(https://code.claude.com/docs/en/best-practices)
+  ⎿  Received 34.3KB (200 OK)
+
+⏺ Let me check if there are any skills besides the config-doctor plugin.
+
+  Searched for 1 pattern, read 1 file (ctrl+o to expand)
+
+⏺ No .claude/ directory exists at all (it's a plugin-installed skill only). Now I have everything needed for the report.
+
+  Claude Code Configuration Health Check
+
+  Date: 2026-03-31
+  Project: claude-config-doctor
+  Reviewer: Claude Code /config-doctor
+  Review iterations: 0
+  Mode: Full
+
+  Summary
+
+  ┌───────────────────────────┬─────────────┬────────┐
+  │          Section          │   Status    │ Issues │
+  ├───────────────────────────┼─────────────┼────────┤
+  │ 0. Global Config          │ ✅ PASS     │ 0      │
+  ├───────────────────────────┼─────────────┼────────┤
+  │ 1. CLAUDE.md              │ ⏭️  SKIPPED  │ 0      │
+  ├───────────────────────────┼─────────────┼────────┤
+  │ 2. Rules                  │ ⏭️  SKIPPED  │ 0      │
+  ├───────────────────────────┼─────────────┼────────┤
+  │ 3. Commands & Skills      │ ⏭️  SKIPPED  │ 0      │
+  ├───────────────────────────┼─────────────┼────────┤
+  │ 4. Agents                 │ ⏭️  SKIPPED  │ 0      │
+  ├───────────────────────────┼─────────────┼────────┤
+  │ 5. Hooks                  │ ⏭️  SKIPPED  │ 0      │
+  ├───────────────────────────┼─────────────┼────────┤
+  │ 6. Cross-file Consistency │ ⏭️  SKIPPED  │ 0      │
+  ├───────────────────────────┼─────────────┼────────┤
+  │ 7. Best Practices         │ ℹ️  ADVISORY │ 4      │
+  ├───────────────────────────┼─────────────┼────────┤
+  │ 8. Insights Integration   │ ⏭️  SKIPPED  │ 0      │
+  └───────────────────────────┴─────────────┴────────┘
+
+  0. Global Config
+
+  - Global CLAUDE.md: ~/.claude/CLAUDE.md does not exist. No conflicts possible.
+  - Global settings.json: ~/.claude/settings.json exists and is valid JSON. Contains permissions (1 allow entry), statusLine configuration, enabledPlugins, and effortLevel
+  setting. No project-level settings exist to conflict with.
+  - .claudeignore: Does not exist in project root.
+
+  Status: ✅ PASS — Global settings are well-formed. No conflicts detected.
+
+  1. CLAUDE.md
+
+  Status: ⏭️  SKIPPED — No CLAUDE.md file exists in the project root or .claude/ directory.
+
+  2. Rules
+
+  Status: ⏭️  SKIPPED — .claude/rules/ directory does not exist.
+
+  3. Commands & Skills
+
+  Status: ⏭️  SKIPPED — No .claude/commands/ or .claude/skills/ directories exist (plugin-installed skills under config-doctor namespace are excluded from review).
+
+  4. Agents
+
+  Status: ⏭️  SKIPPED — .claude/agents/ directory does not exist.
+
+  5. Hooks
+
+  Status: ⏭️  SKIPPED — No hook configurations found in settings files, no .claude/hooks/ directory exists.
+
+  6. Cross-file Consistency
+
+  Status: ⏭️  SKIPPED — Both CLAUDE.md and .claude/settings.json are absent.
+
+  7. Best Practices (Advisory)
+
+  Based on current Claude Code documentation (https://code.claude.com/docs/en/memory, https://code.claude.com/docs/en/best-practices, https://code.claude.com/docs/en/skills,
+  https://code.claude.com/docs/en/hooks):
+
+  1. ℹ️  ADVISORY — No CLAUDE.md: This project has no CLAUDE.md. Running /init will generate a starter file based on the project structure. Even a minimal file with build commands
+   and coding conventions improves session consistency. Official recommendation is to keep it under 200 lines and focus on information Claude cannot infer from the code itself.
+  2. ℹ️  ADVISORY — No .claude/settings.json: No project-level settings file exists. Consider adding one to pre-allow common commands (build, test, lint) so team members don't
+  need to approve them individually each session.
+  3. ℹ️  ADVISORY — No rules or skills: The project uses no .claude/rules/ files or custom skills. For projects with specific coding conventions or repeatable workflows, rules and
+   skills can improve consistency. Skills load on demand (unlike CLAUDE.md which loads every session), making them ideal for domain-specific workflows.
+  4. ℹ️  ADVISORY — No hooks: Hooks provide deterministic enforcement of project rules (e.g., auto-formatting after edits, blocking writes to protected directories). Consider
+  adding hooks for any actions that must happen every time without exception.
+
+  Sources:
+  - https://code.claude.com/docs/en/memory
+  - https://code.claude.com/docs/en/best-practices
+  - https://code.claude.com/docs/en/skills
+  - https://code.claude.com/docs/en/hooks-guide
+  - https://code.claude.com/docs/en/claude-directory
+
+  8. Insights Integration (Advisory)
+
+  Status: ⏭️  SKIPPED — No analyzed sessions for this project. No session-meta files matched project path /Users/tyabu12/Work/claude-config-doctor.
+
+  Recommended Actions
+
+  1. [ℹ️  ADVISORY — Section 7] Run /init to generate a CLAUDE.md file for this project with build commands and coding conventions.
+  2. [ℹ️  ADVISORY — Section 7] Create .claude/settings.json with permission allowlists for commonly used commands to reduce approval prompts for team members.
+  3. [ℹ️  ADVISORY — Section 7] Consider adding .claude/rules/ or .claude/skills/ as the project grows, to codify repeatable workflows and domain-specific conventions.
+  4. [ℹ️  ADVISORY — Section 7] Evaluate whether any project operations (formatting, linting, protected paths) warrant deterministic enforcement via hooks.
+```
+
+</details>
+
+<details>
+<summary>ドッグフーディング: /config-doctor:check light</summary>
+
+```sh
+❯ /config-doctor:check light
+
+⏺ Bash(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null | sed 's|/\.git$||')
+  ⎿  /Users/tyabu12/Work/claude-config-doctor
+
+⏺ Bash(basename /Users/tyabu12/Work/claude-config-doctor)
+  ⎿  claude-config-doctor
+
+  Searched for 9 patterns, read 2 files (ctrl+o to expand)
+
+⏺ Claude Code Configuration Health Check
+
+  Date: 2026-03-31
+  Project: claude-config-doctor
+  Reviewer: Claude Code /config-doctor
+  Review iterations: 0
+  Mode: Light
+
+  Summary
+
+  ┌───────────────────────────┬────────────┬────────┐
+  │          Section          │   Status   │ Issues │
+  ├───────────────────────────┼────────────┼────────┤
+  │ 0. Global Config          │ ✅ PASS    │ 0      │
+  ├───────────────────────────┼────────────┼────────┤
+  │ 1. CLAUDE.md              │ ⏭️  SKIPPED │ 0      │
+  ├───────────────────────────┼────────────┼────────┤
+  │ 2. Rules                  │ ⏭️  SKIPPED │ 0      │
+  ├───────────────────────────┼────────────┼────────┤
+  │ 3. Commands & Skills      │ ⏭️  SKIPPED │ 0      │
+  ├───────────────────────────┼────────────┼────────┤
+  │ 4. Agents                 │ ⏭️  SKIPPED │ 0      │
+  ├───────────────────────────┼────────────┼────────┤
+  │ 5. Hooks                  │ ⏭️  SKIPPED │ 0      │
+  ├───────────────────────────┼────────────┼────────┤
+  │ 6. Cross-file Consistency │ ⏭️  SKIPPED │ 0      │
+  └───────────────────────────┴────────────┴────────┘
+
+  0. Global Config
+
+  - Global CLAUDE.md: Not present. ✅
+  - Global settings.json: Present at ~/.claude/settings.json. Contains permissions.allow (1 entry: mcp__plugin_discord_discord__reply), statusLine configuration, enabledPlugins
+  (clangd-lsp, discord), and effortLevel: "medium". Structure is valid. ✅
+  - .claudeignore: Not present. ✅
+
+  1. CLAUDE.md
+
+  Status: ⏭️  SKIPPED — No CLAUDE.md file exists in the project root.
+
+  2. Rules
+
+  Status: ⏭️  SKIPPED — .claude/rules/ directory does not exist.
+
+  3. Commands & Skills
+
+  Status: ⏭️  SKIPPED — No .claude/commands/ or .claude/skills/ directories exist (plugin-installed skills excluded).
+
+  4. Agents
+
+  Status: ⏭️  SKIPPED — .claude/agents/ directory does not exist.
+
+  5. Hooks
+
+  Status: ⏭️  SKIPPED — No hook configurations found in project or global settings, and no .claude/hooks/ directory exists.
+
+  6. Cross-file Consistency
+
+  Status: ⏭️  SKIPPED — Neither CLAUDE.md nor .claude/settings.json exist at the project level.
+
+  Recommended Actions
+
+  No FAIL or WARN issues found. This project has minimal Claude Code configuration — most sections were skipped because the corresponding files don't exist yet. Consider:
+
+  1. [ℹ️  INFO] Creating a CLAUDE.md at the project root to document conventions, tech stack, and development commands. This helps Claude Code understand your project better.
+  2. [ℹ️  INFO] Creating .claude/settings.json to configure project-level permissions (e.g., allowing build/test commands) so collaborators share the same defaults.
+```
+
+</details>
 
 ## チェック内容
 
