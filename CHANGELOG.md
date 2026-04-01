@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 
 - Plugin project diagnostics — automatically detects `.claude-plugin/plugin.json` and runs plugin-specific checks (manifest, directory structure, skills, agents, hooks, MCP/LSP, cross-component consistency)
+- Marketplace diagnostics — validates `marketplace.json` manifest and supports marketplace-only repos with per-plugin sub-checks
 - Best Practices sections now include agents documentation search
 
 ## [1.0.0] - 2026-03-31

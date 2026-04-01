@@ -1,6 +1,6 @@
 {
   "name": "config-doctor",
-  "description": "Health check for Claude Code configuration files. Validates CLAUDE.md, rules, commands, skills, agents, hooks, settings, and cross-file consistency.",
+  "description": "Health check for Claude Code configuration files. Validates CLAUDE.md, rules, commands, skills, agents, hooks, settings, plugins, marketplace, and cross-file consistency.",
   "version": "1.1.0",
   "author": {
     "name": "tyabu12"
