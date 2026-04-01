@@ -170,6 +170,7 @@ Use WebSearch to check for recent Claude Code plugin best practices. **Restrict 
 - `site:code.claude.com plugin-marketplaces` — marketplace and distribution
 - `site:code.claude.com skills` — skill configuration and frontmatter
 - `site:code.claude.com hooks` — hook configuration patterns
+- `site:code.claude.com agents` — agent configuration and frontmatter
 - `site:anthropic.com/engineering Claude Code plugins` — engineering blog posts
 
 If all searches return zero results, note: "Documentation domains may have changed.

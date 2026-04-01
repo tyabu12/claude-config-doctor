@@ -171,6 +171,7 @@ Use WebSearch to check for recent Claude Code configuration best practices. **Re
 - `site:code.claude.com hooks` — hook configuration patterns
 - `site:code.claude.com commands` — custom command features
 - `site:code.claude.com skills` — skill configuration and frontmatter
+- `site:code.claude.com agents` — agent configuration and frontmatter
 - `site:platform.claude.com Claude Code configuration` — official documentation (formerly docs.anthropic.com)
 - `site:anthropic.com/engineering Claude Code` — engineering blog posts
 

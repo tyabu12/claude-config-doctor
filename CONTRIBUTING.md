@@ -41,7 +41,8 @@ The `/self-check` diagnostic flags this as WARN because `.claude/` alongside `.c
 4. Run `/self-check` and confirm all checks PASS
 5. Run `claude plugin validate .` to verify the plugin manifest and component structure
 6. Test by running `claude --plugin-dir /path/to/claude-config-doctor` in a real project and executing `/config-doctor:check`
-7. Open a PR with a clear description of what changed and why
+7. Test against a plugin project as well (any repo with `.claude-plugin/plugin.json`) to verify plugin diagnostics
+8. Open a PR with a clear description of what changed and why
 
 ## Guidelines
 
