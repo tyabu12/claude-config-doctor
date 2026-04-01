@@ -32,6 +32,25 @@ Read `.claude-plugin/plugin.json` and check:
 - [ ] **settings.json**: If `settings.json` exists at the plugin root, note its presence — this provides default configuration when the plugin is enabled. Verify it is valid JSON. If an `agent` key is present, verify the referenced agent exists in the plugin's `agents/` directory (or custom agents path from manifest). Flag unknown keys as WARN (currently only `agent` is supported; unknown keys are silently ignored).
 - [ ] **Unknown fields**: Flag any top-level fields not in the known schema as WARN (possible typo or future field).
 
+#### marketplace.json (if present)
+
+If `.claude-plugin/marketplace.json` exists, apply the following checks. If it does not exist, skip this subsection silently (no SKIPPED note needed — most plugins don't include one).
+
+- [ ] **JSON syntax**: Verify the file is valid JSON. Malformed JSON prevents the marketplace from loading. Mark as FAIL.
+- [ ] **Required fields**: Verify `name` (string), `owner` (object), and `plugins` (array) are present. Flag absence as FAIL.
+- [ ] **Name format**: Verify `name` is kebab-case (lowercase letters, digits, and hyphens only). Flag invalid format as FAIL.
+- [ ] **Owner**: Verify `owner` has at least `name` (string). If `email` is present, verify it is a string.
+- [ ] **Metadata**: If `metadata` is present, verify it is an object. Check optional fields: `description` (string), `version` (string), `pluginRoot` (string). Flag unknown keys as WARN.
+- [ ] **Plugin entries**: For each entry in `plugins`:
+  - Verify `name` (string, kebab-case) and `source` (string or object) are present. Flag absence as FAIL.
+  - If `source` is a string, verify it starts with `./` (relative path). Verify the path resolves to an existing directory on disk. Flag missing directory as WARN (may be valid for external-source marketplaces).
+  - If `source` is an object, verify it has a `source` field with a recognized type (`github`, `url`, `git-subdir`, `npm`). For `github`: verify `repo` is present. For `url`: verify `url` is present. For `git-subdir`: verify `url` and `path` are present. For `npm`: verify `package` is present.
+  - If `description` is present, verify it is a non-empty string.
+  - If `version` is present, verify it follows semver format. Flag invalid format as WARN.
+  - If `strict` is present, verify it is a boolean.
+- [ ] **Plugin name consistency**: If a plugin entry's `name` matches the `name` in `plugin.json`, check that their `description` fields are consistent (if both present). Flag significant discrepancies as WARN.
+- [ ] **Unknown top-level fields**: Flag fields not in the known schema (`name`, `owner`, `metadata`, `plugins`) as WARN.
+
 ### 1. Directory Structure Validation
 
 Check that the plugin follows the standard directory layout:

@@ -129,55 +129,6 @@ When installed manually, the command is `/config-doctor` instead of `/config-doc
 ```shell
 ❯ /self-check
 
-⏺ Bash(git rev-parse --verify origin/main)
-  ⎿  dc4cee69145ee59b56bb39eeb7e09ad44f6d141c
-
-  Searched for 2 patterns, read 2 files (ctrl+o to expand)
-
-⏺ Bash(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null | sed 's|/\.git$||')
-  ⎿  /Users/tyabu12/Work/claude-config-doctor
-
-⏺ Bash(test -f /Users/tyabu12/Work/claude-config-doctor/.claude-plugin/plugin.json && echo "EXISTS" || echo "NOT_EXISTS")
-  ⎿  EXISTS
-
-⏺ This is a plugin project. Let me read the plugin diagnostic procedure.
-
-  Read 1 file (ctrl+o to expand)
-
-⏺ Let me now run through the plugin diagnostic procedure. I'll start by reading the key files.
-
-  Searched for 13 patterns, read 6 files (ctrl+o to expand)
-
-⏺ Now let me check for path traversal and do the best practices web searches.
-
-  Searched for 1 pattern, read 1 file (ctrl+o to expand)
-
-⏺ Web Search("site:code.claude.com plugins")
-  ⎿  Did 1 search in 9s
-
-⏺ Web Search("site:code.claude.com plugins-reference")
-  ⎿  Did 1 search in 7s
-
-⏺ Web Search("site:code.claude.com skills")
-  ⎿  Did 1 search in 9s
-
-⏺ Web Search("site:code.claude.com hooks")
-  ⎿  Did 1 search in 8s
-
-⏺ Web Search("site:anthropic.com/engineering Claude Code plugins")
-  ⎿  Did 1 search in 8s
-
-⏺ Fetch(https://code.claude.com/docs/en/plugins-reference)
-  ⎿  Received 41.6KB (200 OK)
-
-⏺ Fetch(https://code.claude.com/docs/en/plugins)
-  ⎿  Received 18.2KB (200 OK)
-
-  Searched for 1 pattern (ctrl+o to expand)
-
-⏺ Now I have all the information needed. Let me compile the Phase 1 report. No FAIL items were found, so the cross-review is skipped (iteration count = 0).
-
-  ---
   Claude Code Plugin Health Check
 
   Date: 2026-04-01
@@ -214,9 +165,9 @@ When installed manually, the command is `/config-doctor` instead of `/config-doc
   0. Manifest Validation — ✅ PASS
 
   - JSON syntax: valid
-  - Required field name: present, non-empty string (config-doctor)
+  - Required field name: present, non-empty string ("config-doctor")
   - Name format: kebab-case — valid
-  - Version 1.1.0: valid semver
+  - Version "1.1.0": valid semver
   - Description: present, non-empty string
   - Author: object with name field — valid
   - Optional metadata: repository (valid URL string), license (string), keywords (array of strings) — all valid
@@ -224,14 +175,25 @@ When installed manually, the command is `/config-doctor` instead of `/config-doc
   - No settings.json at plugin root
   - No unknown top-level fields
 
+  marketplace.json:
+  - JSON syntax: valid
+  - Required fields: name, owner, plugins — all present
+  - Name format "tyabu12-claude-config-doctor": kebab-case — valid
+  - Owner: has name field — valid
+  - Metadata: description present (string) — valid
+  - Plugin entry: name "config-doctor" (kebab-case), source "./" (starts with ./, resolves to existing directory) — valid
+  - description: present, non-empty string — valid
+  - Plugin name consistency: marketplace entry "config-doctor" matches plugin.json "config-doctor"; descriptions match
+  - No unknown top-level fields
+
   1. Directory Structure — ⚠️  WARN (1)
 
   - Anti-pattern check: .claude-plugin/ contains only plugin.json and marketplace.json — no component directories inside. PASS
-  - Component directories: skills/ exists at root with skill content. No commands/, agents/, hooks/, output-styles/, .mcp.json, or .lsp.json — expected for this plugin's scope.
+  - Component directories: skills/ exists at root with skill content. No commands/, agents/, hooks/, output-styles/, .mcp.json, or .lsp.json — expected for this plugin's scope
   - README.md: exists at plugin root. PASS
   - Path traversal: no component files reference paths outside the plugin root. PASS
-  - ⚠️  WARN: Stray .claude/ directory exists alongside .claude-plugin/. However, CONTRIBUTING.md (lines 27–33) documents this as intentional: .claude/settings.local.json for
-  local dev permissions and .claude/skills/self-check/ for development-only self-diagnostics. Documented — WARN acknowledged as expected.
+  - ⚠️  WARN: Stray .claude/ directory exists alongside .claude-plugin/. Contains settings.local.json (local dev permissions) and skills/self-check/ (development-only
+  self-diagnostics). CONTRIBUTING.md (lines 29–33) documents this as intentional. Documented — WARN acknowledged as expected.
 
   2. Skills Validation — ✅ PASS
 
@@ -243,9 +205,9 @@ When installed manually, the command is `/config-doctor` instead of `/config-doc
   - allowed-tools: Read, Glob, Grep, WebSearch, WebFetch, Bash, Agent — all valid per reference.md
   - model: opus — valid
   - disable-model-invocation: true — valid boolean
-  - argument-hint: [light | full] — valid string
+  - argument-hint: "[light | full]" — valid string
   - Supporting files: plugin.md, project.md, reference.md — all referenced and all exist in the skill directory
-  - $ARGUMENTS usage: argument-hint is defined and $ARGUMENTS is referenced in SKILL.md (lines 39, 46) and delegated procedure files
+  - $ARGUMENTS usage: argument-hint is defined and $ARGUMENTS is referenced in SKILL.md and delegated procedure files
   - Script references: none (no scripts to check)
 
   3. Commands — ⏭️  SKIPPED
@@ -283,18 +245,17 @@ When installed manually, the command is `/config-doctor` instead of `/config-doc
   - Skill vs command preference: uses skills/ directory (recommended). PASS
   - Portability: no scripts or hardcoded paths — not applicable. PASS
   - Validation support: claude plugin validate . is documented in CONTRIBUTING.md step 5. PASS
-  - ℹ️  ADVISORY: Official docs recommend including a description field in plugin skill SKILL.md frontmatter for discoverability. The check skill already has this. However, the
-  official docs also mention that plugin agents support skills, memory, background frontmatter fields and output styles via output-styles/ — these are newer features the plugin
-  could potentially adopt in the future if needed.
+  - ℹ️  ADVISORY: Official docs document newer plugin features including output styles (output-styles/), LSP servers (.lsp.json), channels, userConfig, and settings.json with
+  agent key for default agent activation. These are not relevant to this plugin's current scope but could be adopted if future development warrants them.
 
   Sources: https://code.claude.com/docs/en/plugins-reference, https://code.claude.com/docs/en/plugins, https://code.claude.com/docs/en/skills,
   https://code.claude.com/docs/en/hooks
 
   Recommended Actions
 
-  1. [⚠️  WARN — Section 1] .claude/ directory exists alongside .claude-plugin/. This is documented as intentional in CONTRIBUTING.md — no action needed unless the project
-  structure changes.
-  2. [ℹ️  ADVISORY — Section 8] Consider evaluating newer plugin features (output styles, agent background/memory fields) if future development warrants them.
+  1. [⚠️  WARN — Section 1] .claude/ directory exists alongside .claude-plugin/. Documented as intentional in CONTRIBUTING.md — no action needed unless the project structure
+  changes.
+  2. [ℹ️  ADVISORY — Section 8] Consider evaluating newer plugin features (output styles, LSP servers, channels, userConfig) if future development warrants them.
 ```
 
 </details>
@@ -321,7 +282,7 @@ The skill automatically detects the project type and runs the appropriate diagno
 
 | Section | What it checks |
 | --- | --- |
-| 0. Manifest | JSON syntax, required fields, name format, version, metadata, userConfig, channels |
+| 0. Manifest | JSON syntax, required fields, name format, version, metadata, userConfig, channels, marketplace.json |
 | 1. Directory Structure | Anti-patterns, component directories, README, path traversal, stray `.claude/` |
 | 2. Skills | SKILL.md existence, frontmatter, description, tool permissions, `$ARGUMENTS`, `${CLAUDE_PLUGIN_ROOT}` |
 | 3. Commands | Frontmatter, description, tool permissions, legacy overlap with skills |

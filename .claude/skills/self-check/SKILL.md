@@ -2,7 +2,7 @@
 name: self-check
 description: Self-check for config-doctor's own project. Use when modifying config-doctor itself.
 disable-model-invocation: true
-allowed-tools: Read, Glob, Grep, Bash
+allowed-tools: Read, Glob, Grep, Bash, WebSearch, WebFetch, Agent
 argument-hint: [base-branch]
 model: opus
 ---
