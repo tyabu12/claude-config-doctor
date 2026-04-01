@@ -4,7 +4,7 @@
 
 A [skill](https://code.claude.com/docs/en/skills) that health-checks your Claude Code configuration files.
 
-It goes beyond structural linting — detecting semantic conflicts across CLAUDE.md, rules, commands, skills, hooks, and settings.
+It goes beyond structural linting — detecting semantic conflicts across CLAUDE.md, rules, commands, skills, hooks, and settings. Also supports [plugin](https://code.claude.com/docs/en/plugins) projects and [marketplace](https://code.claude.com/docs/en/plugin-marketplaces) repositories (manifest validation, directory structure, cross-component consistency, and more).
 
 ## Why config-doctor
 
@@ -97,12 +97,14 @@ Add the marketplace and install the plugin.
 <details>
 <summary>Manual installation (without plugin system)</summary>
 
-Copy [`skills/check/SKILL.md`](./skills/check/SKILL.md) directly into your project:
+Copy the skill files from [`skills/check/`](./skills/check/) directly into your project:
 
 ```bash
 mkdir -p .claude/skills/config-doctor
-curl -fsSL https://raw.githubusercontent.com/tyabu12/claude-config-doctor/main/skills/check/SKILL.md \
-  -o .claude/skills/config-doctor/SKILL.md
+for f in SKILL.md plugin.md project.md reference.md; do
+  curl -fsSL "https://raw.githubusercontent.com/tyabu12/claude-config-doctor/main/skills/check/$f" \
+    -o ".claude/skills/config-doctor/$f"
+done
 ```
 
 When installed manually, the command is `/config-doctor` instead of `/config-doctor:check`.
@@ -122,186 +124,148 @@ When installed manually, the command is `/config-doctor` instead of `/config-doc
 ```
 
 <details>
-<summary>Dogfooding: /self-check (same as `/config-doctor:check`)</summary>
+<summary>Dogfooding: /self-check (Phase 1 only, via `/config-doctor:check`)</summary>
 
 ```shell
 ❯ /self-check
 
-⏺ Bash(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null | sed 's|/\.git$||')
-  ⎿  /Users/tyabu12/Work/claude-config-doctor
+  Claude Code Plugin Health Check
 
-⏺ Bash(basename /Users/tyabu12/Work/claude-config-doctor)
-  ⎿  claude-config-doctor
-
-⏺ Now let me read the key configuration files in parallel.
-
-  Searched for 5 patterns, read 6 files (ctrl+o to expand)
-
-⏺ Now let me check for insights data and run the best practices searches.
-
-  Searched for 1 pattern (ctrl+o to expand)
-
-⏺ Let me validate the insights schema, find matching sessions, and run the best practices searches in parallel.
-
-  Searched for 2 patterns, read 1 file (ctrl+o to expand)
-
-⏺ Web Search("site:code.claude.com CLAUDE.md")
-  ⎿  Did 1 search in 7s
-
-⏺ Web Search("site:code.claude.com hooks")
-  ⎿  Did 1 search in 6s
-
-⏺ Web Search("site:code.claude.com commands")
-  ⎿  Did 1 search in 7s
-
-⏺ Web Search("site:code.claude.com skills")
-  ⎿  Did 1 search in 7s
-
-⏺ Web Search("site:platform.claude.com Claude Code configuration")
-  ⎿  Did 1 search in 6s
-
-⏺ Web Search("site:anthropic.com/engineering Claude Code")
-  ⎿  Did 1 search in 9s
-
-⏺ No sessions matched this project for insights. Let me fetch a couple of key documentation pages for Section 7 advisory recommendations.
-
-⏺ Fetch(https://code.claude.com/docs/en/memory)
-  ⎿  Received 24.4KB (200 OK)
-
-⏺ Fetch(https://code.claude.com/docs/en/best-practices)
-  ⎿  Received 34.3KB (200 OK)
-
-⏺ Found skills to review. Reading skill files.
-
-  Read 2 files (ctrl+o to expand)
-
-⏺ All skill frontmatter and content validated. Now I have everything needed for the report.
-
-  Claude Code Configuration Health Check
-
-  Date: 2026-03-31
-  Project: claude-config-doctor
-  Reviewer: Claude Code /config-doctor
+  Date: 2026-04-01
+  Plugin: config-doctor
+  Reviewer: Claude Code /config-doctor:check
   Review iterations: 0
-  Mode: Full
 
   Summary
 
-  ┌───────────────────────────┬─────────────┬────────┐
-  │          Section          │   Status    │ Issues │
-  ├───────────────────────────┼─────────────┼────────┤
-  │ 0. Global Config          │ ✅ PASS     │ 0      │
-  ├───────────────────────────┼─────────────┼────────┤
-  │ 1. CLAUDE.md              │ ⏭️  SKIPPED  │ 0      │
-  ├───────────────────────────┼─────────────┼────────┤
-  │ 2. Rules                  │ ⏭️  SKIPPED  │ 0      │
-  ├───────────────────────────┼─────────────┼────────┤
-  │ 3. Commands & Skills      │ ✅ PASS     │ 0      │
-  ├───────────────────────────┼─────────────┼────────┤
-  │ 4. Agents                 │ ⏭️  SKIPPED  │ 0      │
-  ├───────────────────────────┼─────────────┼────────┤
-  │ 5. Hooks                  │ ⏭️  SKIPPED  │ 0      │
-  ├───────────────────────────┼─────────────┼────────┤
-  │ 6. Cross-file Consistency │ ⏭️  SKIPPED  │ 0      │
-  ├───────────────────────────┼─────────────┼────────┤
-  │ 7. Best Practices         │ ℹ️  ADVISORY │ 4      │
-  ├───────────────────────────┼─────────────┼────────┤
-  │ 8. Insights Integration   │ ⏭️  SKIPPED  │ 0      │
-  └───────────────────────────┴─────────────┴────────┘
+  ┌────────────────────────────────┬─────────────┬────────┐
+  │            Section             │   Status    │ Issues │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 0. Manifest                    │ ✅ PASS     │ 0      │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 1. Directory Structure         │ ⚠️  WARN     │ 1      │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 2. Skills                      │ ✅ PASS     │ 0      │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 3. Commands                    │ ⏭️  SKIPPED  │ 0      │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 4. Agents                      │ ⏭️  SKIPPED  │ 0      │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 5. Hooks                       │ ⏭️  SKIPPED  │ 0      │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 6. MCP & LSP                   │ ⏭️  SKIPPED  │ 0      │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 7. Cross-Component Consistency │ ✅ PASS     │ 0      │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 8. Best Practices              │ ℹ️  ADVISORY │ 1      │
+  └────────────────────────────────┴─────────────┴────────┘
 
-  0. Global Config
+  Section Details
 
-  - Global CLAUDE.md: ~/.claude/CLAUDE.md does not exist. No conflicts possible.
-  - Global settings.json: ~/.claude/settings.json exists and is valid JSON. Contains permissions (1 allow entry), statusLine configuration, enabledPlugins, and effortLevel
-  setting. No project-level settings exist to conflict with.
-  - .claudeignore: Does not exist in project root.
+  0. Manifest Validation — ✅ PASS
 
-  Status: ✅ PASS — Global settings are well-formed. No conflicts detected.
+  plugin.json:
+  - JSON syntax: valid
+  - Required field name: present, non-empty string ("config-doctor")
+  - Name format: kebab-case — valid
+  - Version "1.1.0": valid semver
+  - Description: present, non-empty string
+  - Author: object with name field — valid
+  - Optional metadata: repository (valid URL string), license (string), keywords (array of strings) — all valid
+  - No component path overrides, userConfig, or channels defined
+  - No settings.json at plugin root
+  - No unknown top-level fields
 
-  1. CLAUDE.md
+  marketplace.json:
+  - JSON syntax: valid
+  - Required fields: name, owner, plugins — all present
+  - Name format "tyabu12-claude-config-doctor": kebab-case — valid
+  - Owner: has name field — valid
+  - Metadata: description present (string) — valid
+  - Plugin entry: name "config-doctor" (kebab-case), source "./" (starts with ./, resolves to existing directory) — valid
+  - Description: present, non-empty string — valid
+  - Plugin name consistency: marketplace entry "config-doctor" matches plugin.json "config-doctor"; descriptions match
+  - No unknown top-level fields
 
-  Status: ⏭️  SKIPPED — No CLAUDE.md file exists in the project root or .claude/ directory.
+  1. Directory Structure — ⚠️  WARN (1)
 
-  2. Rules
+  - Anti-pattern check: .claude-plugin/ contains only plugin.json and marketplace.json — no component directories inside. PASS
+  - Component directories: skills/ exists at root with skill content. No commands/, agents/, hooks/, output-styles/, .mcp.json, or .lsp.json — expected for this plugin's scope
+  - README.md: exists at plugin root. PASS
+  - Path traversal: no component files reference paths outside the plugin root. PASS
+  - ⚠️  WARN: Stray .claude/ directory exists alongside .claude-plugin/. Contains settings.local.json (local dev permissions) and skills/self-check/ (development-only
+  self-diagnostics). CONTRIBUTING.md (lines 29–33) documents this as intentional. Documented — WARN acknowledged as expected.
 
-  Status: ⏭️  SKIPPED — .claude/rules/ directory does not exist.
+  2. Skills Validation — ✅ PASS
 
-  3. Commands & Skills
+  Skill: skills/check/ (self-skip rule overridden per /self-check instructions)
 
-  Commands: Skipped — .claude/commands/ does not exist.
+  - SKILL.md exists: yes
+  - Frontmatter syntax: well-formed YAML
+  - description: present, ~195 characters (under 250 limit)
+  - allowed-tools: Read, Glob, Grep, WebSearch, WebFetch, Bash, Agent — all valid per reference.md
+  - model: opus — valid
+  - disable-model-invocation: true — valid boolean
+  - argument-hint: "[light | full]" — valid string
+  - Supporting files: plugin.md, project.md, reference.md — all referenced and all exist in the skill directory
+  - $ARGUMENTS usage: argument-hint is defined and $ARGUMENTS is referenced in SKILL.md and delegated procedure files
+  - Script references: none (no scripts to check)
 
-  Skills:
+  3. Commands — ⏭️  SKIPPED
 
-  .claude/skills/self-check/SKILL.md
-  - SKILL.md exists: ✅ PASS
-  - Frontmatter syntax: ✅ PASS
-  - Tool permissions: ✅ PASS — Read, Glob, Grep, Bash
-  - description length: ✅ PASS — 74 characters
-  - model: ✅ PASS — opus
-  - Procedure accuracy: ✅ PASS
+  No commands/ directory exists.
 
-  skills/check/SKILL.md (plugin skill, reviewed per override)
-  - SKILL.md exists: ✅ PASS
-  - Frontmatter syntax: ✅ PASS
-  - Tool permissions: ✅ PASS — Read, Glob, Grep, WebSearch, WebFetch, Bash, Agent
-  - description length: ✅ PASS — 95 characters
-  - model: ✅ PASS — opus
-  - Encoding: ✅ PASS — UTF-8
-  - Procedure accuracy: ✅ PASS
-  - Review Loop pattern: ✅ PASS
+  4. Agents — ⏭️  SKIPPED
 
-  Status: ✅ PASS — All skills pass frontmatter, tool permissions, and content checks.
+  No agents/ directory exists.
 
-  4. Agents
+  5. Hooks — ⏭️  SKIPPED
 
-  Status: ⏭️  SKIPPED — .claude/agents/ directory does not exist.
+  No hooks/hooks.json, no inline hooks in plugin.json, no hooks/ directory.
 
-  5. Hooks
+  6. MCP & LSP — ⏭️  SKIPPED
 
-  Status: ⏭️  SKIPPED — No hook configurations found in settings files, no .claude/hooks/ directory exists.
+  No .mcp.json, .lsp.json, or inline MCP/LSP config in plugin.json.
 
-  6. Cross-file Consistency
+  7. Cross-Component Consistency — ✅ PASS
 
-  Status: ⏭️  SKIPPED — Both CLAUDE.md and .claude/settings.json are absent.
+  - Skill→Agent references: none (no agents referenced)
+  - Command→Agent references: no commands
+  - Agent→Skill references: no agents
+  - Hook→Script references: no hooks
+  - Channel→MCP references: no channels
+  - Manifest→Component consistency: no custom component paths in manifest; default skills/ directory contains expected skill files
+  - Namespace consistency: only skills/ exists, no commands/ — no naming conflicts
+  - settings.json alignment: no settings.json at plugin root
 
-  7. Best Practices (Advisory)
+  8. Best Practices (Advisory) — ℹ️  ADVISORY (1)
 
-  Based on current Claude Code documentation (https://code.claude.com/docs/en/memory, https://code.claude.com/docs/en/best-practices, https://code.claude.com/docs/en/skills,
-  https://code.claude.com/docs/en/hooks):
+  Compared against official documentation from code.claude.com (plugins, plugins-reference, skills, hooks pages).
 
-  1. ℹ️  ADVISORY — No CLAUDE.md: This project has no CLAUDE.md. Running /init will generate a starter file based on the project structure. Even a minimal file with build commands
-   and coding conventions improves session consistency. Official recommendation is to keep it under 200 lines and focus on information Claude cannot infer from the code itself.
-  2. ℹ️  ADVISORY — No .claude/settings.json: No project-level settings file exists. Consider adding one to pre-allow common commands (build, test, lint) so team members don't
-  need to approve them individually each session.
-  3. ℹ️  ADVISORY — No rules or skills: The project uses no .claude/rules/ files or custom skills. For projects with specific coding conventions or repeatable workflows, rules and
-   skills can improve consistency. Skills load on demand (unlike CLAUDE.md which loads every session), making them ideal for domain-specific workflows.
-  4. ℹ️  ADVISORY — No hooks: Hooks provide deterministic enforcement of project rules (e.g., auto-formatting after edits, blocking writes to protected directories). Consider
-  adding hooks for any actions that must happen every time without exception.
+  - Plugin structure: follows standard layout. PASS
+  - Skill vs command preference: uses skills/ directory (recommended). PASS
+  - Portability: no scripts or hardcoded paths — not applicable. PASS
+  - Validation support: claude plugin validate . is documented in CONTRIBUTING.md step 5. PASS
+  - ℹ️  ADVISORY: Official docs document newer plugin features including output styles (output-styles/), LSP servers (.lsp.json), channels, userConfig, and settings.json with
+  agent key for default agent activation. These are not relevant to this plugin's current scope but could be adopted if future development warrants them.
 
-  Sources:
-  - https://code.claude.com/docs/en/memory
-  - https://code.claude.com/docs/en/best-practices
-  - https://code.claude.com/docs/en/skills
-  - https://code.claude.com/docs/en/hooks-guide
-  - https://code.claude.com/docs/en/claude-directory
-
-  8. Insights Integration (Advisory)
-
-  Status: ⏭️  SKIPPED — No analyzed sessions for this project. No session-meta files matched project path /Users/tyabu12/Work/claude-config-doctor.
+  Sources: https://code.claude.com/docs/en/plugins-reference, https://code.claude.com/docs/en/plugins, https://code.claude.com/docs/en/skills,
+  https://code.claude.com/docs/en/hooks
 
   Recommended Actions
 
-  1. [ℹ️  ADVISORY — Section 7] Run /init to generate a CLAUDE.md file for this project with build commands and coding conventions.
-  2. [ℹ️  ADVISORY — Section 7] Create .claude/settings.json with permission allowlists for commonly used commands to reduce approval prompts for team members.
-  3. [ℹ️  ADVISORY — Section 7] Consider adding .claude/rules/ or .claude/skills/ as the project grows, to codify repeatable workflows and domain-specific conventions.
-  4. [ℹ️  ADVISORY — Section 7] Evaluate whether any project operations (formatting, linting, protected paths) warrant deterministic enforcement via hooks.
+  1. [⚠️  WARN — Section 1] .claude/ directory exists alongside .claude-plugin/. Documented as intentional in CONTRIBUTING.md — no action needed unless the project structure
+  changes.
+  2. [ℹ️  ADVISORY — Section 8] Consider evaluating newer plugin features (output styles, LSP servers, channels, userConfig) if future development warrants them.
 ```
 
 </details>
 
 ## What it checks
 
-The skill consists of the following 9 review sections.
+The skill automatically detects the project type (standard project, plugin, or marketplace) and runs the appropriate diagnostics.
+
+### Standard projects (`.claude/` configuration)
 
 | Section | What it checks |
 | --- | --- |
@@ -314,6 +278,24 @@ The skill consists of the following 9 review sections.
 | 6. Cross-file | JSON validity, permission conflicts, hook-permission alignment |
 | 7. Best Practices | Fetches latest Anthropic docs at runtime and compares against your config |
 | 8. Insights | Aggregates `/insights` friction data into actionable config fixes |
+
+### Plugin projects (`.claude-plugin/plugin.json`)
+
+| Section | What it checks |
+| --- | --- |
+| 0. Manifest | JSON syntax, required fields, name format, version, metadata, userConfig, channels, marketplace.json |
+| 1. Directory Structure | Anti-patterns, component directories, README, path traversal, stray `.claude/` |
+| 2. Skills | SKILL.md existence, frontmatter, description, tool permissions, `$ARGUMENTS`, `${CLAUDE_PLUGIN_ROOT}` |
+| 3. Commands | Frontmatter, description, tool permissions, legacy overlap with skills |
+| 4. Agents | Required fields, supported fields, model, tools, isolation, security restrictions |
+| 5. Hooks | hooks.json syntax, event names, handler structure, script portability, orphan scripts |
+| 6. MCP & LSP | JSON syntax, server entries, portability, channel references, extension format |
+| 7. Cross-Component | Skill↔Agent refs, hook→script refs, channel→MCP refs, namespace conflicts |
+| 8. Best Practices | Fetches latest Anthropic plugin docs at runtime and compares against your config |
+
+### Marketplace repositories (`.claude-plugin/marketplace.json` without `plugin.json`)
+
+Marketplace repos are automatically detected and each local plugin listed in `marketplace.json` receives the full plugin diagnostic above. Remote plugin entries are validated for source structure only.
 
 FAIL items are cross-reviewed by a sandboxed subagent (max 1 iteration) before the final report.
 
