@@ -22,6 +22,22 @@ Check the command argument: `$ARGUMENTS`
 4. If the result is anything else: stop immediately and output:
    > "Unrecognized argument. Valid options: `light` (skip advisory sections 7-8), `full` (all sections), or omit for full review."
 
+## Insights Preflight (full mode only)
+
+If mode is `light`, skip this section entirely.
+
+Before starting the procedure, check `/insights` data freshness:
+
+1. Check if `~/.claude/usage-data/facets/` exists and contains `.json` files.
+2. If the directory does not exist or is empty:
+   - Ask the user: "No `/insights` data found. Section 8 (Insights Integration) will be SKIPPED. Run `/insights` first to include usage analysis, or continue without it?"
+   - If the user chooses to stop, end with: "Run `/insights`, then re-run `/config-doctor:check`."
+3. If facets files exist, check the most recent modification time via Bash (`stat -f '%m' <file>` on macOS, `stat -c '%Y' <file>` on Linux). Compare against current epoch time.
+   - If the newest file is older than 24 hours:
+     - Ask the user: "Last `/insights` run was on DATE. Section 8 results may be outdated. Run `/insights` first, or continue with existing data?"
+     - If the user chooses to stop, end with: "Run `/insights`, then re-run `/config-doctor:check`."
+4. If fresh (within 24 hours), proceed silently.
+
 ## Procedure
 
 Run the following reviews sequentially and collect findings as you go.

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [1.1.1] - 2026-04-01
 
+### Added
+
+- Insights Preflight check for full mode — warns early if `/insights` data is missing or older than 24 hours, before spending tokens on the full diagnostic
+
 ### Security
 
 - Harden prompt injection defenses across multiple input surfaces
