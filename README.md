@@ -4,7 +4,7 @@
 
 A [skill](https://code.claude.com/docs/en/skills) that health-checks your Claude Code configuration files.
 
-It goes beyond structural linting — detecting semantic conflicts across CLAUDE.md, rules, commands, skills, hooks, and settings. Also supports [plugin](https://code.claude.com/docs/en/plugins) projects (manifest validation, directory structure, cross-component consistency, and more).
+It goes beyond structural linting — detecting semantic conflicts across CLAUDE.md, rules, commands, skills, hooks, and settings. Also supports [plugin](https://code.claude.com/docs/en/plugins) projects and [marketplace](https://code.claude.com/docs/en/plugin-marketplaces) repositories (manifest validation, directory structure, cross-component consistency, and more).
 
 ## Why config-doctor
 
@@ -164,6 +164,7 @@ When installed manually, the command is `/config-doctor` instead of `/config-doc
 
   0. Manifest Validation — ✅ PASS
 
+  plugin.json:
   - JSON syntax: valid
   - Required field name: present, non-empty string ("config-doctor")
   - Name format: kebab-case — valid
@@ -182,7 +183,7 @@ When installed manually, the command is `/config-doctor` instead of `/config-doc
   - Owner: has name field — valid
   - Metadata: description present (string) — valid
   - Plugin entry: name "config-doctor" (kebab-case), source "./" (starts with ./, resolves to existing directory) — valid
-  - description: present, non-empty string — valid
+  - Description: present, non-empty string — valid
   - Plugin name consistency: marketplace entry "config-doctor" matches plugin.json "config-doctor"; descriptions match
   - No unknown top-level fields
 
@@ -262,7 +263,7 @@ When installed manually, the command is `/config-doctor` instead of `/config-doc
 
 ## What it checks
 
-The skill automatically detects the project type and runs the appropriate diagnostics.
+The skill automatically detects the project type (standard project, plugin, or marketplace) and runs the appropriate diagnostics.
 
 ### Standard projects (`.claude/` configuration)
 
@@ -291,6 +292,10 @@ The skill automatically detects the project type and runs the appropriate diagno
 | 6. MCP & LSP | JSON syntax, server entries, portability, channel references, extension format |
 | 7. Cross-Component | Skill↔Agent refs, hook→script refs, channel→MCP refs, namespace conflicts |
 | 8. Best Practices | Fetches latest Anthropic plugin docs at runtime and compares against your config |
+
+### Marketplace repositories (`.claude-plugin/marketplace.json` without `plugin.json`)
+
+Marketplace repos are automatically detected and each local plugin listed in `marketplace.json` receives the full plugin diagnostic above. Remote plugin entries are validated for source structure only.
 
 FAIL items are cross-reviewed by a sandboxed subagent (max 1 iteration) before the final report.
 

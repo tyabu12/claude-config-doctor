@@ -8,7 +8,26 @@ This check always runs in full mode — there is no `light` option.
 
 ## Pre-Procedure Setup
 
-Read `.claude-plugin/plugin.json` to understand the plugin's metadata and component configuration.
+Determine the operating mode based on which manifest files exist:
+
+### Standard plugin mode (default)
+
+If `.claude-plugin/plugin.json` exists, read it to understand the plugin's metadata and component configuration. Proceed with the full procedure below.
+
+### Marketplace-only mode
+
+If this procedure was invoked for a marketplace-only repo (`.claude-plugin/marketplace.json` exists but `.claude-plugin/plugin.json` does not):
+
+1. Read `.claude-plugin/marketplace.json` as the primary manifest.
+2. In Section 0 (Manifest Validation), skip the `plugin.json` subsection entirely. Run the `marketplace.json` subsection as **required** (not optional).
+3. For each entry in the `plugins` array where `source` is a local relative path (starts with `./`):
+   a. Resolve the path relative to the repo root.
+   b. If `<resolved-path>/.claude-plugin/plugin.json` exists, run the full procedure (Sections 0–8) against that subdirectory as if it were the plugin root. Prefix all findings with the plugin name and path.
+   c. If the subdirectory does not have `.claude-plugin/plugin.json`, flag as WARN: "Local plugin entry `<name>` at `<path>` has no plugin.json manifest."
+   d. If the resolved directory does not exist on disk, flag as WARN (already covered by marketplace.json validation).
+   e. **Path containment**: After resolving the path, verify it is still within the repo root (e.g., `./../../outside` starts with `./` but escapes the repo). Flag paths that resolve outside the repo root as FAIL.
+4. For plugin entries with non-local sources (object-type sources like `github`, `npm`, etc.), validate the source structure per the marketplace.json checks but skip filesystem-level validation. Note in the report: "Remote plugin `<name>` — source structure validated; filesystem checks skipped."
+5. After processing all plugin entries, run Section 7 (Cross-Component Consistency) and Section 8 (Best Practices) once at the marketplace repo level.
 
 ## Procedure
 
@@ -16,6 +35,8 @@ Run the following reviews sequentially and collect findings as you go.
 If a section's target files do not exist, mark it SKIPPED and move on.
 
 ### 0. Manifest Validation
+
+> **Marketplace-only mode**: Skip the `plugin.json` checks below and proceed directly to the `marketplace.json` subsection, treating it as required.
 
 Read `.claude-plugin/plugin.json` and check:
 
@@ -55,7 +76,7 @@ If `.claude-plugin/marketplace.json` exists, apply the following checks. If it d
 
 Check that the plugin follows the standard directory layout:
 
-- [ ] **Anti-pattern check**: Verify that `commands/`, `agents/`, `skills/`, `hooks/`, `output-styles/` directories are NOT inside `.claude-plugin/`. Only `plugin.json` belongs in `.claude-plugin/`. This is a common mistake explicitly warned against in official documentation. Flag as FAIL.
+- [ ] **Anti-pattern check**: Verify that `commands/`, `agents/`, `skills/`, `hooks/`, `output-styles/` directories are NOT inside `.claude-plugin/`. Only `plugin.json` and `marketplace.json` belong in `.claude-plugin/`. This is a common mistake explicitly warned against in official documentation. Flag as FAIL.
 - [ ] **Component directories at root**: For each component type, check if the directory exists at the expected location (root level or custom path from manifest):
   - `skills/` — skill directories with `SKILL.md`
   - `commands/` — command markdown files (legacy; `skills/` preferred for new skills)
@@ -215,7 +236,7 @@ For search results that mention specific new features or configuration patterns 
 # Claude Code Plugin Health Check
 
 **Date**: YYYY-MM-DD
-**Plugin**: (name from plugin.json, or directory name)
+**Plugin**: (name from plugin.json, marketplace.json, or directory name)
 **Reviewer**: Claude Code /config-doctor:check
 **Review iterations**: N
 
@@ -237,4 +258,40 @@ For search results that mention specific new features or configuration patterns 
 1. [❌ FAIL — Section N] Description of the issue and recommended fix
 2. [⚠️ WARN — Section N] Description of the issue and recommended fix
 3. [ℹ️ ADVISORY — Section N] Description of the suggestion
+```
+
+### Marketplace-only mode output
+
+In marketplace-only mode, use this header instead and repeat the summary table per local plugin:
+
+```markdown
+# Claude Code Marketplace Health Check
+
+**Date**: YYYY-MM-DD
+**Marketplace**: (name from marketplace.json, or directory name)
+**Reviewer**: Claude Code /config-doctor:check
+**Review iterations**: N
+
+## Marketplace Manifest
+| Check | Status | Issues |
+|-------|--------|--------|
+| marketplace.json | ✅ PASS / ⚠️ WARN / ❌ FAIL | count |
+
+## Plugin: <plugin-name> (from <source-path>)
+
+| Section | Status | Issues |
+|---------|--------|--------|
+| 0. Manifest | ... | ... |
+| ... | ... | ... |
+
+(repeat for each local plugin)
+
+## Marketplace-Level Checks
+| Section | Status | Issues |
+|---------|--------|--------|
+| 7. Cross-Component Consistency | ... | ... |
+| 8. Best Practices | ... | ... |
+
+## Recommended Actions
+1. ...
 ```

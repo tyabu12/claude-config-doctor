@@ -4,7 +4,7 @@
 
 Claude Code の設定ファイル群のヘルスチェックを行う[スキル](https://code.claude.com/docs/ja/skills)です。
 
-構造的な lint にとどまらず、CLAUDE.md / rules / commands / skills / hooks / settings 間の意味的な矛盾を検出します。[プラグイン](https://code.claude.com/docs/en/plugins)プロジェクト（マニフェスト検証、ディレクトリ構造、コンポーネント間整合性など）にも対応しています。
+構造的な lint にとどまらず、CLAUDE.md / rules / commands / skills / hooks / settings 間の意味的な矛盾を検出します。[プラグイン](https://code.claude.com/docs/en/plugins)プロジェクトや[マーケットプレイス](https://code.claude.com/docs/en/plugin-marketplaces)リポジトリ（マニフェスト検証、ディレクトリ構造、コンポーネント間整合性など）にも対応しています。
 
 ## なぜ config-doctor か
 
@@ -165,6 +165,7 @@ done
 
   0. Manifest Validation — ✅ PASS
 
+  plugin.json:
   - JSON syntax: valid
   - Required field name: present, non-empty string ("config-doctor")
   - Name format: kebab-case — valid
@@ -183,7 +184,7 @@ done
   - Owner: has name field — valid
   - Metadata: description present (string) — valid
   - Plugin entry: name "config-doctor" (kebab-case), source "./" (starts with ./, resolves to existing directory) — valid
-  - description: present, non-empty string — valid
+  - Description: present, non-empty string — valid
   - Plugin name consistency: marketplace entry "config-doctor" matches plugin.json "config-doctor"; descriptions match
   - No unknown top-level fields
 
@@ -263,7 +264,7 @@ done
 
 ## チェック内容
 
-プロジェクトの種類を自動検出し、適切な診断を実行します。
+プロジェクトの種類（通常プロジェクト、プラグイン、マーケットプレイス）を自動検出し、適切な診断を実行します。
 
 ### 通常プロジェクト（`.claude/` 設定）
 
@@ -292,6 +293,10 @@ done
 | 6. MCP & LSP | JSON 構文、サーバエントリ、ポータビリティ、channel 参照、拡張子形式 |
 | 7. Cross-Component | Skill↔Agent 参照、hook→script 参照、channel→MCP 参照、名前空間の競合 |
 | 8. Best Practices | 実行時に最新の Anthropic プラグインドキュメントを取得し、設定と比較 |
+
+### マーケットプレイスリポジトリ（`.claude-plugin/marketplace.json` のみ、`plugin.json` なし）
+
+マーケットプレイスリポジトリは自動検出され、`marketplace.json` に記載された各ローカルプラグインに対して上記のプラグイン診断がフルで実行されます。リモートプラグインエントリはソース構造の検証のみ行われます。
 
 FAIL 項目はサンドボックス化されたサブエージェントによるクロスレビュー（最大1回）を経て、最終レポートに反映されます。
 

@@ -1,5 +1,5 @@
 ---
-description: Health check for Claude Code configuration files. Automatically detects project type (standard project or plugin) and runs the appropriate diagnostics. Use 'light' for structural checks only (standard projects). Read-only.
+description: Health check for Claude Code configuration files. Automatically detects project type (standard project, plugin, or marketplace) and runs the appropriate diagnostics. Use 'light' for structural checks only (standard projects). Read-only.
 argument-hint: [light | full]
 disable-model-invocation: true
 allowed-tools: Read, Glob, Grep, WebSearch, WebFetch, Bash, Agent
@@ -8,7 +8,7 @@ model: opus
 
 # /config-doctor:check
 
-Health check for all Claude Code configuration files. Automatically detects whether the current project is a **standard project** or a **plugin**, and runs the appropriate diagnostics.
+Health check for all Claude Code configuration files. Automatically detects whether the current project is a **standard project**, **plugin**, or **marketplace**, and runs the appropriate diagnostics.
 
 **This skill is strictly read-only. Do NOT modify any files.**
 
@@ -29,7 +29,9 @@ Health check for all Claude Code configuration files. Automatically detects whet
    - Repo root: `git rev-parse --path-format=absolute --git-common-dir 2>/dev/null | sed 's|/\.git$||'` (works in worktrees). Fallback: `git rev-parse --show-toplevel 2>/dev/null || pwd`
    - Project name: `basename <repo-root>`
    - Save the repo root — use this consistently across all sections.
-2. Detect project type: check if `.claude-plugin/plugin.json` exists at the project root.
+2. Detect project type:
+   a. Check if `.claude-plugin/plugin.json` exists at the project root.
+   b. Check if `.claude-plugin/marketplace.json` exists at the project root.
 
 ## Project Type Detection and Procedure Selection
 
@@ -40,7 +42,14 @@ Health check for all Claude Code configuration files. Automatically detects whet
    > "Plugin diagnostics always run in full mode. The `light` argument is only available for standard project checks. Proceeding with full plugin check."
 3. Follow the procedure defined in plugin.md.
 
-### If `.claude-plugin/plugin.json` does NOT exist → Standard project
+### If `.claude-plugin/plugin.json` does NOT exist, but `.claude-plugin/marketplace.json` exists → Marketplace project
+
+1. Read `plugin.md` (in this skill's directory) for the diagnostic procedure.
+2. If `$ARGUMENTS` is `light`, inform the user:
+   > "Marketplace diagnostics always run in full mode. The `light` argument is only available for standard project checks. Proceeding with full marketplace check."
+3. Follow the procedure defined in plugin.md in **marketplace-only mode** (see plugin.md for details).
+
+### If neither file exists → Standard project
 
 1. Read `project.md` (in this skill's directory) for the standard project diagnostic procedure.
 2. Pass through the `$ARGUMENTS` value (light/full/empty) for mode selection as defined in project.md.
@@ -50,6 +59,7 @@ Health check for all Claude Code configuration files. Automatically detects whet
 
 - If the detection check itself fails (e.g., not a git repository, no readable filesystem), report the error and stop.
 - If both `.claude-plugin/plugin.json` AND `.claude/` configuration exist (hybrid project), treat as a **plugin project** and note in the report: "This project has both plugin metadata and standard `.claude/` configuration. Running plugin diagnostics. To also check standard project configuration, run `/config-doctor:check` again after temporarily removing `.claude-plugin/`."
+- If `.claude-plugin/` directory exists but contains neither `plugin.json` nor `marketplace.json`, treat as a **standard project** and add a WARN to the report: "`.claude-plugin/` directory exists but contains no recognized manifest (`plugin.json` or `marketplace.json`). This directory may be incomplete or misconfigured."
 
 ## Report Format
 
