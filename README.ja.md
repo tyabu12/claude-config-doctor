@@ -19,21 +19,7 @@ config-doctor は ClaudeCode のスキルを使うことで、その先を検査
 | **ファイル間の矛盾検出**（CLAUDE.md ↔ rules ↔ settings） | ❌ | ✅ |
 | **Insights 統合**（friction パターン → 設定改善提案） | ❌ | ✅ |
 | **ベストプラクティス同期**（実行時に最新の公式ドキュメントを取得） | ❌ | ✅ |
-
-### claude-md-management との違い
-
-Anthropic 公式の [claude-md-management](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-md-management) は CLAUDE.md の品質改善に特化したプラグインです。
-
-| | config-doctor | claude-md-management |
-| --- | --- | --- |
-| 対象範囲 | 設定ファイル**全体**（CLAUDE.md / rules / commands / skills / agents / hooks / settings） | **CLAUDE.md のみ** |
-| 目的 | 健全性チェック・クロスファイル整合性検証 | 品質監査・改善・セッション学習の反映 |
-| 読み取り/書き込み | **読み取り専用**（レポート出力のみ） | **読み取り+編集**（ユーザー承認後に修正） |
-| 提供機能 | スキル 1 つ（`/config-doctor:check`） | スキル 1 つ + コマンド 1 つ（`/revise-claude-md`） |
-
-両者は競合ではなく補完関係にあります。config-doctor で設定全体を**診断**し、claude-md-management で CLAUDE.md を**改善**する使い方が効果的です。
-
----
+| 決定論的な出力 | ✅ | ❌（LLM ベース） |
 
 なおこのスキルはセキュリティ上の観点から、レポートを出力するだけなので読み取り専用になっています。
 ファイルは一切変更されません。
@@ -319,6 +305,16 @@ FAIL 項目はサンドボックス化されたサブエージェントによる
 - **読み取り専用** — 設定ファイルを一切変更しません。自動修正機能もありません
 - **実行時間**: Full レビューは5分程度かかります。`light` モードはより高速ですが最新のベストプラクティスの検索と `/insights` レポートの分析をスキップします
 - **アンインストール**: `/plugin uninstall config-doctor@tyabu12-claude-config-doctor`（手動インストールの場合は `.claude/skills/config-doctor/` を削除）
+
+## 関連ツール
+
+### claude-md-management
+
+Anthropic 公式の [claude-md-management](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-md-management) プラグインは CLAUDE.md の品質監査・改善を行います。config-doctor が設定全体を**診断**（読み取り専用）し、claude-md-management が CLAUDE.md を**編集**（ユーザー承認後）する補完関係です。
+
+### rulesync
+
+[rulesync](https://github.com/dyoshikawa/rulesync) は Claude Code、Cursor、Copilot、Gemini CLI など多数の AI コーディングアシスタントの設定を、単一のソースから一括生成する CLI ツールです。config-doctor は rulesync が生成した Claude Code の設定を検証し、仕様の変更や意味的な問題を検出できます。rulesync で**生成**し、config-doctor で**検証**する使い方が効果的です。
 
 ## コントリビュート
 
