@@ -19,23 +19,9 @@ config-doctor uses a Claude Code skill to inspect what they can't.
 | **Cross-file contradiction detection** (CLAUDE.md ↔ rules ↔ settings) | ❌ | ✅ |
 | **Insights integration** (friction patterns → config recommendations) | ❌ | ✅ |
 | **Best practices sync** (fetches latest official docs at runtime) | ❌ | ✅ |
+| Deterministic output | ✅ | ❌ (LLM-based) |
 
-### Difference from claude-md-management
-
-Anthropic's official [claude-md-management](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-md-management) is a plugin dedicated to improving the quality of CLAUDE.md files.
-
-| | config-doctor | claude-md-management |
-| --- | --- | --- |
-| Scope | **All** config files (CLAUDE.md / rules / commands / skills / agents / hooks / settings) | **CLAUDE.md only** |
-| Purpose | Health check & cross-file consistency validation | Quality audit, improvement & session learning capture |
-| Read / Write | **Read-only** (report output only) | **Read + Edit** (modifies files after user approval) |
-| Components | 1 skill (`/config-doctor:check`) | 1 skill + 1 command (`/revise-claude-md`) |
-
-The two are complementary, not competing. Use config-doctor to **diagnose** your entire configuration, and claude-md-management to **improve** your CLAUDE.md files.
-
----
-
-For security reasons, this skill is strictly read-only — it only outputs a report and never modifies any files.
+For security reasons, this skill is strictly read-only. It only outputs a report and never modifies any files.
 
 If the findings look reasonable, just type something like "update my config based on these findings" into the prompt and Claude Code will optimize your configuration for you. Easy!
 
@@ -317,6 +303,16 @@ Because this skill reads local session data, it is designed with security in min
 - **Read-only** — never modifies any configuration files. No auto-fix functionality
 - **Execution time**: Full review takes about 5 minutes. `light` mode is faster but skips best practices search and `/insights` report analysis
 - **Uninstall**: `/plugin uninstall config-doctor@tyabu12-claude-config-doctor` (or delete `.claude/skills/config-doctor/` if installed manually)
+
+## Related
+
+### claude-md-management
+
+Anthropic's official [claude-md-management](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-md-management) plugin audits and improves CLAUDE.md files. config-doctor **diagnoses** your entire configuration (read-only); claude-md-management **edits** CLAUDE.md after approval. The two are complementary.
+
+### rulesync
+
+[rulesync](https://github.com/dyoshikawa/rulesync) generates configuration for many AI coding assistants (Claude Code, Cursor, Copilot, Gemini CLI, etc.) from a single shared source. config-doctor can validate the generated Claude Code output, catching spec drift or semantic issues that the generation step might miss. Use rulesync to **generate**, then config-doctor to **verify**.
 
 ## Contributing
 
