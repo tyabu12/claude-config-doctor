@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.1.2] - 2026-04-03
+
+### Fixed
+
+- Avoid nested command substitution in initialization steps that some tools block
+- Add graceful fallback when web search is unavailable in check skill
+- Prevent guessing or constructing URLs for WebFetch without prior search results
+
 ## [1.1.1] - 2026-04-01
 
 ### Added
