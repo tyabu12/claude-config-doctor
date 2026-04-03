@@ -28,7 +28,11 @@ config-doctor は ClaudeCode のスキルを使うことで、その先を検査
 
 ### デモ
 
+<div align="center">
+
 https://github.com/user-attachments/assets/10ca5a0a-607f-4c48-9a26-40f028cb40a4
+
+</div>
 
 ### 出力例
 

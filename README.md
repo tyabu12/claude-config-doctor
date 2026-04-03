@@ -27,7 +27,11 @@ If the findings look reasonable, just type something like "update my config base
 
 ### Demo
 
+<div align="center">
+
 https://github.com/user-attachments/assets/8d705fe5-46ac-4a62-9b50-0fc9c3d686b0
+
+</div>
 
 ### Sample output
 
