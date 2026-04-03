@@ -26,6 +26,10 @@ config-doctor は ClaudeCode のスキルを使うことで、その先を検査
 
 診断結果が問題なさそうであれば、「指摘を元に設定を更新して」とそのままプロンプトに打てばあとは Claude Code がいい感じに設定を最適化してくれます。簡単ですね！
 
+### デモ
+
+https://github.com/user-attachments/assets/10ca5a0a-607f-4c48-9a26-40f028cb40a4
+
 ### 出力例
 
 ```shell
