@@ -6,6 +6,12 @@ Claude Code の設定ファイル群のヘルスチェックを行う[スキル]
 
 構造的な lint にとどまらず、CLAUDE.md / rules / commands / skills / hooks / settings 間の意味的な矛盾を検出します。[プラグイン](https://code.claude.com/docs/en/plugins)プロジェクトや[マーケットプレイス](https://code.claude.com/docs/en/plugin-marketplaces)リポジトリ（マニフェスト検証、ディレクトリ構造、コンポーネント間整合性など）にも対応しています。
 
+<div align="center">
+
+https://github.com/user-attachments/assets/10ca5a0a-607f-4c48-9a26-40f028cb40a4
+
+</div>
+
 ## なぜ config-doctor か
 
 一般的な Linter はファイルの存在、frontmatter の構文、命名規則をチェックします。
@@ -25,14 +31,6 @@ config-doctor は ClaudeCode のスキルを使うことで、その先を検査
 ファイルは一切変更されません。
 
 診断結果が問題なさそうであれば、「指摘を元に設定を更新して」とそのままプロンプトに打てばあとは Claude Code がいい感じに設定を最適化してくれます。簡単ですね！
-
-### デモ
-
-<div align="center">
-
-https://github.com/user-attachments/assets/10ca5a0a-607f-4c48-9a26-40f028cb40a4
-
-</div>
 
 ### 出力例
 
