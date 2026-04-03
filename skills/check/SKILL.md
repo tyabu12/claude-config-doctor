@@ -25,9 +25,9 @@ Health check for all Claude Code configuration files. Automatically detects whet
 
 ## Initialization
 
-1. Determine project context via Bash:
+1. Determine project context via Bash. Run each as a separate command — do not combine with command substitution (`$(...)`) as some tools block nested expansion:
    - Repo root: `git rev-parse --path-format=absolute --git-common-dir 2>/dev/null | sed 's|/\.git$||'` (works in worktrees). Fallback: `git rev-parse --show-toplevel 2>/dev/null || pwd`
-   - Project name: `basename <repo-root>`
+   - Project name: Run `basename` with the literal path returned by the previous command (e.g., `basename /Users/you/project`).
    - Save the repo root — use this consistently across all sections.
 2. Detect project type:
    a. Check if `.claude-plugin/plugin.json` exists at the project root.

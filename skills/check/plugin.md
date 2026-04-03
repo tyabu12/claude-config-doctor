@@ -204,7 +204,7 @@ Verify that all plugin components reference each other correctly:
 
 ### 8. Best Practices (Advisory)
 
-Use WebSearch to check for recent Claude Code plugin best practices. **Restrict searches to these domain-prefixed queries only:**
+Use WebSearch (or equivalent web search tool) to check for recent Claude Code plugin best practices. **Restrict searches to these domain-prefixed queries only:**
 - `site:code.claude.com plugins` — plugin creation and structure guidance
 - `site:code.claude.com plugins-reference` — plugin technical reference
 - `site:code.claude.com plugin-marketplaces` — marketplace and distribution
@@ -212,6 +212,10 @@ Use WebSearch to check for recent Claude Code plugin best practices. **Restrict 
 - `site:code.claude.com hooks` — hook configuration patterns
 - `site:code.claude.com agents` — agent configuration and frontmatter
 - `site:anthropic.com/engineering Claude Code plugins` — engineering blog posts
+
+If no web search capability is available, mark this section SKIPPED with note: "Web search not available in this environment. Skipping best practices comparison."
+
+Do NOT guess or construct URLs for WebFetch without a prior search result.
 
 If all searches return zero results, note: "Documentation domains may have changed.
 Skipping best practices comparison." and mark SKIPPED.
