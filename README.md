@@ -6,6 +6,12 @@ A [skill](https://code.claude.com/docs/en/skills) that health-checks your Claude
 
 It goes beyond structural linting — detecting semantic conflicts across CLAUDE.md, rules, commands, skills, hooks, and settings. Also supports [plugin](https://code.claude.com/docs/en/plugins) projects and [marketplace](https://code.claude.com/docs/en/plugin-marketplaces) repositories (manifest validation, directory structure, cross-component consistency, and more).
 
+<div align="center">
+
+https://github.com/user-attachments/assets/8d705fe5-46ac-4a62-9b50-0fc9c3d686b0
+
+</div>
+
 ## Why config-doctor
 
 Typical linters check file existence, frontmatter syntax, and naming conventions.
