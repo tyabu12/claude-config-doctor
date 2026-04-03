@@ -271,7 +271,8 @@ The skill automatically detects the project type (standard project, plugin, or m
 | 7. Best Practices | Fetches latest Anthropic docs at runtime and compares against your config |
 | 8. Insights | Aggregates `/insights` friction data into actionable config fixes |
 
-### Plugin projects (`.claude-plugin/plugin.json`)
+<details>
+<summary>Plugin projects (`.claude-plugin/plugin.json`)</summary>
 
 | Section | What it checks |
 | --- | --- |
@@ -285,9 +286,15 @@ The skill automatically detects the project type (standard project, plugin, or m
 | 7. Cross-Component | Skill↔Agent refs, hook→script refs, channel→MCP refs, namespace conflicts |
 | 8. Best Practices | Fetches latest Anthropic plugin docs at runtime and compares against your config |
 
-### Marketplace repositories (`.claude-plugin/marketplace.json` without `plugin.json`)
+</details>
+
+
+<details>
+<summary>Marketplace repositories (`.claude-plugin/marketplace.json` without `plugin.json`)</summary>
 
 Marketplace repos are automatically detected and each local plugin listed in `marketplace.json` receives the full plugin diagnostic above. Remote plugin entries are validated for source structure only.
+
+</details>
 
 FAIL items are cross-reviewed by a sandboxed subagent (max 1 iteration) before the final report.
 
@@ -302,13 +309,30 @@ Because this skill reads local session data, it is designed with security in min
 - **Subagent sandboxing** — cross-review subagents are limited to `Read, Glob, Grep` only
 - **Insights privacy** — session data is aggregated into abstract recommendations; per-session behavioral details are never included in the report
 
-## Requirements / Limitations
+## FAQ
 
-- **Model**: The skill automatically uses the Opus model to ensure check accuracy
-- Full mode also searches for the latest best practices, so it uses `WebSearch`, `WebFetch`, and `Agent` tools (sections 7-8). `light` mode uses only `Read`, `Glob`, `Grep`, `Bash`, and `Agent`
-- **Read-only** — never modifies any configuration files. No auto-fix functionality
-- **Execution time**: Full review takes about 5 minutes. `light` mode is faster but skips best practices search and `/insights` report analysis
-- **Uninstall**: `/plugin uninstall config-doctor@tyabu12-claude-config-doctor` (or delete `.claude/skills/config-doctor/` if installed manually)
+### Check results vary slightly between runs. Is that normal?
+
+Yes. config-doctor is LLM-based, so results are non-deterministic. Minor wording differences between runs are expected. If a finding disappears on re-run, it was likely a borderline case. Consider it a soft signal rather than a confirmed issue.
+
+### Should I use `full` or `light` mode?
+
+- **`light`** — structural checks only (`Read`, `Glob`, `Grep`, `Bash`, `Agent`). Fast, good for routine use.
+- **`full`** (default) — adds best practices search and `/insights` analysis (`WebSearch`, `WebFetch`, `Agent`). Takes about 5 minutes. Recommended monthly or after major config changes.
+
+The skill automatically uses the **Opus model** in both modes to ensure check accuracy.
+
+### Can it auto-fix the issues it finds?
+
+No. config-doctor is strictly **read-only** and never modifies any files. After reviewing the report, type something like `update my config based on these findings` into the prompt and Claude Code will apply the fixes for you.
+
+### How do I uninstall?
+
+```shell
+/plugin uninstall config-doctor@tyabu12-claude-config-doctor
+```
+
+If installed manually, delete `.claude/skills/config-doctor/`.
 
 ## Related
 

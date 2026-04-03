@@ -272,7 +272,8 @@ done
 | 7. Best Practices | 実行時に最新の Anthropic 公式ドキュメントを取得し、設定と比較 |
 | 8. Insights | `/insights` の friction データを集約し、設定改善を提案 |
 
-### プラグインプロジェクト（`.claude-plugin/plugin.json`）
+<details>
+<summary>プラグインプロジェクト（`.claude-plugin/plugin.json`）</summary>
 
 | セクション | チェック内容 |
 | --- | --- |
@@ -286,9 +287,15 @@ done
 | 7. Cross-Component | Skill↔Agent 参照、hook→script 参照、channel→MCP 参照、名前空間の競合 |
 | 8. Best Practices | 実行時に最新の Anthropic プラグインドキュメントを取得し、設定と比較 |
 
-### マーケットプレイスリポジトリ（`.claude-plugin/marketplace.json` のみ、`plugin.json` なし）
+</details>
+
+
+<details>
+<summary>マーケットプレイスリポジトリ（`.claude-plugin/marketplace.json` のみ、`plugin.json` なし）</summary>
 
 マーケットプレイスリポジトリは自動検出され、`marketplace.json` に記載された各ローカルプラグインに対して上記のプラグイン診断がフルで実行されます。リモートプラグインエントリはソース構造の検証のみ行われます。
+
+</details>
 
 FAIL 項目はサンドボックス化されたサブエージェントによるクロスレビュー（最大1回）を経て、最終レポートに反映されます。
 
@@ -304,13 +311,30 @@ FAIL 項目はサンドボックス化されたサブエージェントによる
 - **サブエージェントのサンドボックス** — クロスレビュー用サブエージェントは `Read, Glob, Grep` のみに制限
 - **Insights のプライバシー** — セッションデータは抽象的な推奨事項に集約され、セッション固有の詳細は含まれない
 
-## 要件・制限事項
+## FAQ
 
-- **使用モデル**: チェックの精度を確保するため、スキルでは自動的に Opus モデルを使用します
-- Full モードは最新のベストプラクティスも検索するため `WebSearch`、`WebFetch`、`Agent` ツールも使用します（セクション 7-8）。`light` モードは `Read`、`Glob`、`Grep`、`Bash`、`Agent` のみです
-- **読み取り専用** — 設定ファイルを一切変更しません。自動修正機能もありません
-- **実行時間**: Full レビューは5分程度かかります。`light` モードはより高速ですが最新のベストプラクティスの検索と `/insights` レポートの分析をスキップします
-- **アンインストール**: `/plugin uninstall config-doctor@tyabu12-claude-config-doctor`（手動インストールの場合は `.claude/skills/config-doctor/` を削除）
+### チェック結果が実行のたびに微妙に異なります。正常ですか？
+
+はい。config-doctor は LLM ベースのため、結果は非決定的であり、実行ごとに表現の揺れは発生します。再実行で消える指摘はグレーゾーンの可能性が高いため、ヒント程度に捉えてください。
+
+### `full` と `light`、どちらを使うべきですか？
+
+- **`light`** は構造チェックのみ（`Read`、`Glob`、`Grep`、`Bash`、`Agent`）。高速で日常的な利用に最適です。
+- **`full`**（デフォルト）はベストプラクティス検索と `/insights` 分析を追加（`WebSearch`、`WebFetch`、`Agent`）。約5分かかります。トークンを一定消費してしまうため、一定期間ごとや大きな設定変更の際の診断を推奨します。
+
+チェックの精度を確保するため、どちらのモードでも自動的に **Opus モデル**を使用します。
+
+### 見つかった問題を自動修正できますか？
+
+いいえ。config-doctor はセキュリティの観点から厳しく**読み取り専用**になっており、ファイルを一切変更しません。レポートを確認した後、プロンプトに「この指摘を元に設定を更新して」と入力すれば、Claude Code が修正を適用してくれます。
+
+### アンインストール方法は？
+
+```shell
+/plugin uninstall config-doctor@tyabu12-claude-config-doctor
+```
+
+手動インストールの場合は `.claude/skills/config-doctor/` を削除してください。
 
 ## 関連ツール
 
