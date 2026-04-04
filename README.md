@@ -226,7 +226,7 @@ Yes. config-doctor runs its own check on itself (dogfooding). The development re
   ├────────────────────────────────┼─────────────┼────────┤
   │ 7. Cross-Component Consistency │ ✅ PASS     │ 0      │
   ├────────────────────────────────┼─────────────┼────────┤
-  │ 8. Best Practices              │ ℹ️  ADVISORY │ 2      │
+  │ 8. Best Practices              │ ℹ️  ADVISORY │ 1      │
   └────────────────────────────────┴─────────────┴────────┘
 
   Section Details
@@ -307,16 +307,15 @@ Yes. config-doctor runs its own check on itself (dogfooding). The development re
   - Namespace consistency: only skills/ exists, no commands/ — no naming conflicts
   - settings.json alignment: no settings.json at plugin root
 
-  8. Best Practices (Advisory) — ℹ️  ADVISORY (2)
+  8. Best Practices (Advisory) — ℹ️  ADVISORY (1)
 
-  Compared against official documentation from code.claude.com (plugins, plugins-reference, skills, hooks pages).
+  Compared against official documentation from code.claude.com (plugins, plugins-reference, skills pages).
 
   - Plugin structure: follows standard layout. PASS
   - Skill vs command preference: uses skills/ directory (recommended). PASS
   - Portability: no scripts or hardcoded paths — not applicable. PASS
   - Validation support: claude plugin validate . is documented in CONTRIBUTING.md step 5. PASS
-  - ℹ️  ADVISORY: reference.md is missing the PermissionDenied hook event, which is documented in the official plugins-reference page. This event fires when a tool call is denied
-  by the auto mode classifier.
+  - Hook event names: reference.md hook event list matches the official plugins-reference documentation exactly (26 events including PermissionDenied). PASS
   - ℹ️  ADVISORY: Official docs document newer plugin features including output styles (output-styles/), LSP servers (.lsp.json), channels, userConfig, bin/ directory for
   executables, and settings.json with agent key for default agent activation. These are not relevant to this plugin's current scope but could be adopted if future development
   warrants them.
@@ -327,8 +326,7 @@ Yes. config-doctor runs its own check on itself (dogfooding). The development re
 
   1. [⚠️  WARN — Section 1] .claude/ directory exists alongside .claude-plugin/. Documented as intentional in CONTRIBUTING.md — no action needed unless the project structure
   changes.
-  2. [ℹ️  ADVISORY — Section 8] Add PermissionDenied to the valid hook event names in reference.md to match official documentation.
-  3. [ℹ️  ADVISORY — Section 8] Consider evaluating newer plugin features (output styles, LSP servers, channels, userConfig, bin/) if future development warrants them.
+  2. [ℹ️  ADVISORY — Section 8] Consider evaluating newer plugin features (output styles, LSP servers, channels, userConfig, bin/) if future development warrants them.
 ```
 
 </details>
