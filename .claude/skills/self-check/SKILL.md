@@ -2,19 +2,20 @@
 name: self-check
 description: Self-check for config-doctor's own project. Use when modifying config-doctor itself.
 disable-model-invocation: true
-allowed-tools: Read, Glob, Grep, Bash, WebSearch, WebFetch, Agent
+allowed-tools: Read, Glob, Grep, Bash, WebSearch, WebFetch, Agent, Edit
 argument-hint: [base-branch]
 model: opus
 ---
 
 # /self-check
 
-Self-check for config-doctor's own project. Runs in two phases:
+Self-check for config-doctor's own project. Runs in three phases:
 
 1. **Structural Check** — runs the config-doctor:check procedure against this project
 2. **Diff Review** — reviews the diff from the base branch across 5 perspectives
+3. **README Update** — updates the self-check output embedded in README.md and README.ja.md
 
-**This skill is strictly read-only. Do NOT modify any files.**
+**This skill is read-only except for Phase 3, which updates README self-check output.**
 
 ## Argument Parsing
 
@@ -146,3 +147,49 @@ Append after the Phase 1 report:
 | D. Goal Achievement | ✅ PASS / ⚠️ WARN | count |
 | E. Documentation Consistency | ✅ PASS / ⚠️ WARN / ❌ FAIL | count |
 ```
+
+## Phase 3: README Update
+
+After Phase 1 (and Phase 2 if applicable), update the self-check output embedded in `README.md` and `README.ja.md`.
+
+This phase always runs regardless of whether Phase 2 was skipped.
+
+### Safety Constraints
+
+- **Scope of edits**: Phase 3 may ONLY edit `README.md` and `README.ja.md`. No other files.
+- **Edit scope within files**: Only the self-check output code block (inside the `<details>` block whose `<summary>` contains "Self-check output" or "セルフチェックの実行結果") may be modified. No other content in the READMEs may change.
+- **No fabrication**: The replacement content MUST be the actual Phase 1 output from the current run. Do not paraphrase, summarize, or modify the diagnostic output.
+
+### Procedure
+
+1. **Extract Phase 1 output**: From the Phase 1 report generated earlier in this run, extract the complete report text — everything from the header (e.g., "Claude Code Plugin Health Check") through the final "Recommended Actions" item. This is the content that will go inside the code fence.
+
+2. **Locate the target blocks**: In both `README.md` and `README.ja.md`, find the `<details>` block whose `<summary>` contains "Self-check output" or "セルフチェックの実行結果". The existing structure is:
+   ````
+   <details>
+   <summary>Self-check output (Phase 1 only)</summary>
+
+   ```shell
+   ❯ /self-check
+
+   (Phase 1 output, indented with 2 spaces)
+   ```
+
+   </details>
+   ````
+
+3. **Replace content**: Using the `Edit` tool, replace the entire content between the opening `` ```shell `` line and the closing `` ``` `` line (inclusive) with the new Phase 1 output, formatted as:
+   ````
+   ```shell
+   ❯ /self-check
+
+   (Phase 1 report text, indented with 2 spaces to match existing style)
+   ```
+   ````
+   Both files receive the same code block content. Only the `<summary>` text differs (English vs Japanese) and must NOT be modified.
+
+4. **Verification**: After editing, read back the modified `<details>` block from both files and confirm:
+   - The `<details>` and `</details>` tags are intact
+   - The `<summary>` text is unchanged
+   - The code fence opens with `` ```shell `` and closes with `` ``` ``
+   - The content matches the Phase 1 output
