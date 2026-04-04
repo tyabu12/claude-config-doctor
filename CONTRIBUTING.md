@@ -17,6 +17,8 @@ claude-config-doctor/
 ├── .claude/skills/
 │   └── self-check/
 │       └── SKILL.md          # Dogfooding: runs config-doctor against itself
+├── .github/workflows/
+│   └── validate-plugin.yml    # CI: runs `claude plugin validate .`
 ├── README.md
 ├── README.ja.md
 ├── CONTRIBUTING.md
