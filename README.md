@@ -200,7 +200,7 @@ Yes. config-doctor runs its own check on itself (dogfooding). The development re
 
   Claude Code Plugin Health Check
 
-  Date: 2026-04-01
+  Date: 2026-04-04
   Plugin: config-doctor
   Reviewer: Claude Code /config-doctor:check
   Review iterations: 0
@@ -226,7 +226,7 @@ Yes. config-doctor runs its own check on itself (dogfooding). The development re
   ├────────────────────────────────┼─────────────┼────────┤
   │ 7. Cross-Component Consistency │ ✅ PASS     │ 0      │
   ├────────────────────────────────┼─────────────┼────────┤
-  │ 8. Best Practices              │ ℹ️  ADVISORY │ 1      │
+  │ 8. Best Practices              │ ℹ️  ADVISORY │ 2      │
   └────────────────────────────────┴─────────────┴────────┘
 
   Section Details
@@ -237,7 +237,7 @@ Yes. config-doctor runs its own check on itself (dogfooding). The development re
   - JSON syntax: valid
   - Required field name: present, non-empty string ("config-doctor")
   - Name format: kebab-case — valid
-  - Version "1.1.0": valid semver
+  - Version "1.1.2": valid semver
   - Description: present, non-empty string
   - Author: object with name field — valid
   - Optional metadata: repository (valid URL string), license (string), keywords (array of strings) — all valid
@@ -263,7 +263,7 @@ Yes. config-doctor runs its own check on itself (dogfooding). The development re
   - README.md: exists at plugin root. PASS
   - Path traversal: no component files reference paths outside the plugin root. PASS
   - ⚠️  WARN: Stray .claude/ directory exists alongside .claude-plugin/. Contains settings.local.json (local dev permissions) and skills/self-check/ (development-only
-  self-diagnostics). CONTRIBUTING.md (lines 29–33) documents this as intentional. Documented — WARN acknowledged as expected.
+  self-diagnostics). CONTRIBUTING.md (lines 41–48) documents this as intentional. Documented — WARN acknowledged as expected.
 
   2. Skills Validation — ✅ PASS
 
@@ -307,7 +307,7 @@ Yes. config-doctor runs its own check on itself (dogfooding). The development re
   - Namespace consistency: only skills/ exists, no commands/ — no naming conflicts
   - settings.json alignment: no settings.json at plugin root
 
-  8. Best Practices (Advisory) — ℹ️  ADVISORY (1)
+  8. Best Practices (Advisory) — ℹ️  ADVISORY (2)
 
   Compared against official documentation from code.claude.com (plugins, plugins-reference, skills, hooks pages).
 
@@ -315,17 +315,20 @@ Yes. config-doctor runs its own check on itself (dogfooding). The development re
   - Skill vs command preference: uses skills/ directory (recommended). PASS
   - Portability: no scripts or hardcoded paths — not applicable. PASS
   - Validation support: claude plugin validate . is documented in CONTRIBUTING.md step 5. PASS
-  - ℹ️  ADVISORY: Official docs document newer plugin features including output styles (output-styles/), LSP servers (.lsp.json), channels, userConfig, and settings.json with
-  agent key for default agent activation. These are not relevant to this plugin's current scope but could be adopted if future development warrants them.
+  - ℹ️  ADVISORY: reference.md is missing the PermissionDenied hook event, which is documented in the official plugins-reference page. This event fires when a tool call is denied
+  by the auto mode classifier.
+  - ℹ️  ADVISORY: Official docs document newer plugin features including output styles (output-styles/), LSP servers (.lsp.json), channels, userConfig, bin/ directory for
+  executables, and settings.json with agent key for default agent activation. These are not relevant to this plugin's current scope but could be adopted if future development
+  warrants them.
 
-  Sources: https://code.claude.com/docs/en/plugins-reference, https://code.claude.com/docs/en/plugins, https://code.claude.com/docs/en/skills,
-  https://code.claude.com/docs/en/hooks
+  Sources: https://code.claude.com/docs/en/plugins-reference, https://code.claude.com/docs/en/plugins, https://code.claude.com/docs/en/skills
 
   Recommended Actions
 
   1. [⚠️  WARN — Section 1] .claude/ directory exists alongside .claude-plugin/. Documented as intentional in CONTRIBUTING.md — no action needed unless the project structure
   changes.
-  2. [ℹ️  ADVISORY — Section 8] Consider evaluating newer plugin features (output styles, LSP servers, channels, userConfig) if future development warrants them.
+  2. [ℹ️  ADVISORY — Section 8] Add PermissionDenied to the valid hook event names in reference.md to match official documentation.
+  3. [ℹ️  ADVISORY — Section 8] Consider evaluating newer plugin features (output styles, LSP servers, channels, userConfig, bin/) if future development warrants them.
 ```
 
 </details>
