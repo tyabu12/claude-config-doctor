@@ -3,7 +3,7 @@ name: self-check
 description: Self-check for config-doctor's own project. Use when modifying config-doctor itself.
 disable-model-invocation: true
 allowed-tools: Read, Glob, Grep, Bash, WebSearch, WebFetch, Agent, Edit
-argument-hint: [base-branch]
+argument-hint: [base-branch] [--check-only]
 model: opus
 ---
 
@@ -20,9 +20,12 @@ Self-check for config-doctor's own project. Runs in three phases:
 ## Argument Parsing
 
 1. Trim leading and trailing whitespace from `$ARGUMENTS`.
-2. If the trimmed value is non-empty, use it as `BASE_BRANCH`. Otherwise, default to `origin/main`.
-3. Validate: run `git rev-parse --verify $BASE_BRANCH` via Bash. If it fails, stop immediately and output:
+2. If the trimmed value contains `--check-only`, remove it from the value and set `CHECK_ONLY = true`. Otherwise, set `CHECK_ONLY = false`.
+3. If the remaining value (after removing `--check-only`) is non-empty, use it as `BASE_BRANCH`. Otherwise, default to `origin/main`.
+4. Validate: run `git rev-parse --verify $BASE_BRANCH` via Bash. If it fails, stop immediately and output:
    > "Invalid base branch: `$BASE_BRANCH`. Verify the ref exists (e.g., `git fetch origin`) and try again."
+
+When `CHECK_ONLY = true`, only Phase 1 runs. Phase 2 and Phase 3 are skipped entirely.
 
 ## Phase 1: Structural Check
 
@@ -33,6 +36,8 @@ Read `skills/check/SKILL.md` and execute its review procedure against this proje
 All other safety constraints in the SKILL.md (read-only, prompt injection defense, output quoting, etc.) remain in effect.
 
 ## Phase 2: Diff Review
+
+**Skip this phase if `CHECK_ONLY = true`.**
 
 After Phase 1 completes, review the diff from `BASE_BRANCH`.
 
@@ -149,6 +154,8 @@ Append after the Phase 1 report:
 ```
 
 ## Phase 3: README Update
+
+**Skip this phase if `CHECK_ONLY = true`.**
 
 After Phase 1 (and Phase 2 if applicable), update the self-check output embedded in `README.md` and `README.ja.md`.
 
