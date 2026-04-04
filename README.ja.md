@@ -116,8 +116,86 @@ done
 /config-doctor:check light
 ```
 
+## チェック内容
+
+プロジェクトの種類（通常プロジェクト、プラグイン、マーケットプレイス）を自動検出し、適切な診断を実行します。
+
+### 通常プロジェクト（`.claude/` 設定）
+
+| セクション | チェック内容 |
+| --- | --- |
+| 0. Global Config | `~/.claude/` のグローバル設定、`.claudeignore` の妥当性 |
+| 1. CLAUDE.md | 行数、エンコーディング、パス正確性、Tech Stack の乖離、陳腐化 |
+| 2. Rules | Frontmatter、glob パターン、内容の正確性、CLAUDE.md との整合性 |
+| 3. Commands & Skills | 構文、ツール権限、手順の正確性、サポートファイル、Agent の相互参照 |
+| 4. Agents | 必須フィールド、ツールリスト、モデル値、評価基準 |
+| 5. Hooks | 孤立スクリプト、matcher の正確性、スクリプトロジック、exit code、frontmatter hooks |
+| 6. Cross-file | JSON の妥当性、権限の矛盾、hook と permission の整合性 |
+| 7. Best Practices | 実行時に最新の Anthropic 公式ドキュメントを取得し、設定と比較 |
+| 8. Insights | `/insights` の friction データを集約し、設定改善を提案 |
+
 <details>
-<summary>Dogfooding: /self-check (`/config-doctor:check` による Phase 1 のみ抜粋)</summary>
+<summary>プラグインプロジェクト（`.claude-plugin/plugin.json`）</summary>
+
+| セクション | チェック内容 |
+| --- | --- |
+| 0. Manifest | JSON 構文、必須フィールド、名前形式、バージョン、メタデータ、userConfig、channels、marketplace.json |
+| 1. Directory Structure | アンチパターン、コンポーネントディレクトリ、README、パストラバーサル、`.claude/` の混在 |
+| 2. Skills | SKILL.md の存在、frontmatter、description、ツール権限、`$ARGUMENTS`、`${CLAUDE_PLUGIN_ROOT}` |
+| 3. Commands | Frontmatter、description、ツール権限、skills との重複 |
+| 4. Agents | 必須フィールド、対応フィールド、model、tools、isolation、セキュリティ制約 |
+| 5. Hooks | hooks.json 構文、イベント名、ハンドラ構造、スクリプトのポータビリティ、孤立スクリプト |
+| 6. MCP & LSP | JSON 構文、サーバエントリ、ポータビリティ、channel 参照、拡張子形式 |
+| 7. Cross-Component | Skill↔Agent 参照、hook→script 参照、channel→MCP 参照、名前空間の競合 |
+| 8. Best Practices | 実行時に最新の Anthropic プラグインドキュメントを取得し、設定と比較 |
+
+</details>
+
+
+<details>
+<summary>マーケットプレイスリポジトリ（`.claude-plugin/marketplace.json` のみ、`plugin.json` なし）</summary>
+
+マーケットプレイスリポジトリは自動検出され、`marketplace.json` に記載された各ローカルプラグインに対して上記のプラグイン診断がフルで実行されます。リモートプラグインエントリはソース構造の検証のみ行われます。
+
+</details>
+
+FAIL 項目はサンドボックス化されたサブエージェントによるクロスレビュー（最大1回）を経て、最終レポートに反映されます。
+
+## セキュリティ
+
+ユーザーのローカルのセッションデータを読み取るため、
+カスタムスキルは実用性を担保しつつ、可能な限りセキュリティに配慮しています。
+
+- **完全に読み取り専用** — ファイルを一切変更しない
+- **プロンプトインジェクション防御** — 設定ファイルや Web コンテンツはすべて分析対象のデータとして扱い、指示として実行しない
+- **Web アクセスの制限** — WebSearch と WebFetch は Anthropic 公式ドメインのハードコードされた許可リストに限定。プロジェクト固有の情報が検索クエリに含まれることはない
+- **出力のサニタイズ** — 指摘事項はファイルパスと行番号で参照し、内容をそのまま引用しない。レポートを共有した際の二次インジェクションを防止
+- **サブエージェントのサンドボックス** — クロスレビュー用サブエージェントは `Read, Glob, Grep` のみに制限
+- **Insights のプライバシー** — セッションデータは抽象的な推奨事項に集約され、セッション固有の詳細は含まれない
+
+## FAQ
+
+### チェック結果が実行のたびに微妙に異なります。正常ですか？
+
+はい。config-doctor は LLM ベースのため、結果は非決定的であり、実行ごとに表現の揺れは発生します。再実行で消える指摘はグレーゾーンの可能性が高いため、ヒント程度に捉えてください。
+
+### `full` と `light`、どちらを使うべきですか？
+
+- **`light`** は構造チェックのみ（`Read`、`Glob`、`Grep`、`Bash`、`Agent`）。高速で日常的な利用に最適です。
+- **`full`**（デフォルト）はベストプラクティス検索と `/insights` 分析を追加（`WebSearch`、`WebFetch`、`Agent`）。約5分かかります。トークンを一定消費してしまうため、一定期間ごとや大きな設定変更の際の診断を推奨します。
+
+チェックの精度を確保するため、どちらのモードでも自動的に **Opus モデル**を使用します。
+
+### 見つかった問題を自動修正できますか？
+
+いいえ。config-doctor はセキュリティの観点から厳しく**読み取り専用**になっており、ファイルを一切変更しません。レポートを確認した後、プロンプトに「この指摘を元に設定を更新して」と入力すれば、Claude Code が修正を適用してくれます。
+
+### このプラグイン自体のメンテナンスや品質は大丈夫ですか？
+
+はい。config-doctor は自分自身に対してもチェックを実行しています（dogfooding）。開発リポジトリには `/self-check` コマンドがあり、`/config-doctor:check` を自身のプラグイン構造に対して実行します。
+
+<details>
+<summary>セルフチェックの実行結果（Phase 1 のみ）</summary>
 
 ```shell
 ❯ /self-check
@@ -254,80 +332,6 @@ done
 
 </details>
 
-## チェック内容
-
-プロジェクトの種類（通常プロジェクト、プラグイン、マーケットプレイス）を自動検出し、適切な診断を実行します。
-
-### 通常プロジェクト（`.claude/` 設定）
-
-| セクション | チェック内容 |
-| --- | --- |
-| 0. Global Config | `~/.claude/` のグローバル設定、`.claudeignore` の妥当性 |
-| 1. CLAUDE.md | 行数、エンコーディング、パス正確性、Tech Stack の乖離、陳腐化 |
-| 2. Rules | Frontmatter、glob パターン、内容の正確性、CLAUDE.md との整合性 |
-| 3. Commands & Skills | 構文、ツール権限、手順の正確性、サポートファイル、Agent の相互参照 |
-| 4. Agents | 必須フィールド、ツールリスト、モデル値、評価基準 |
-| 5. Hooks | 孤立スクリプト、matcher の正確性、スクリプトロジック、exit code、frontmatter hooks |
-| 6. Cross-file | JSON の妥当性、権限の矛盾、hook と permission の整合性 |
-| 7. Best Practices | 実行時に最新の Anthropic 公式ドキュメントを取得し、設定と比較 |
-| 8. Insights | `/insights` の friction データを集約し、設定改善を提案 |
-
-<details>
-<summary>プラグインプロジェクト（`.claude-plugin/plugin.json`）</summary>
-
-| セクション | チェック内容 |
-| --- | --- |
-| 0. Manifest | JSON 構文、必須フィールド、名前形式、バージョン、メタデータ、userConfig、channels、marketplace.json |
-| 1. Directory Structure | アンチパターン、コンポーネントディレクトリ、README、パストラバーサル、`.claude/` の混在 |
-| 2. Skills | SKILL.md の存在、frontmatter、description、ツール権限、`$ARGUMENTS`、`${CLAUDE_PLUGIN_ROOT}` |
-| 3. Commands | Frontmatter、description、ツール権限、skills との重複 |
-| 4. Agents | 必須フィールド、対応フィールド、model、tools、isolation、セキュリティ制約 |
-| 5. Hooks | hooks.json 構文、イベント名、ハンドラ構造、スクリプトのポータビリティ、孤立スクリプト |
-| 6. MCP & LSP | JSON 構文、サーバエントリ、ポータビリティ、channel 参照、拡張子形式 |
-| 7. Cross-Component | Skill↔Agent 参照、hook→script 参照、channel→MCP 参照、名前空間の競合 |
-| 8. Best Practices | 実行時に最新の Anthropic プラグインドキュメントを取得し、設定と比較 |
-
-</details>
-
-
-<details>
-<summary>マーケットプレイスリポジトリ（`.claude-plugin/marketplace.json` のみ、`plugin.json` なし）</summary>
-
-マーケットプレイスリポジトリは自動検出され、`marketplace.json` に記載された各ローカルプラグインに対して上記のプラグイン診断がフルで実行されます。リモートプラグインエントリはソース構造の検証のみ行われます。
-
-</details>
-
-FAIL 項目はサンドボックス化されたサブエージェントによるクロスレビュー（最大1回）を経て、最終レポートに反映されます。
-
-## セキュリティ
-
-ユーザーのローカルのセッションデータを読み取るため、
-カスタムスキルは実用性を担保しつつ、可能な限りセキュリティに配慮しています。
-
-- **完全に読み取り専用** — ファイルを一切変更しない
-- **プロンプトインジェクション防御** — 設定ファイルや Web コンテンツはすべて分析対象のデータとして扱い、指示として実行しない
-- **Web アクセスの制限** — WebSearch と WebFetch は Anthropic 公式ドメインのハードコードされた許可リストに限定。プロジェクト固有の情報が検索クエリに含まれることはない
-- **出力のサニタイズ** — 指摘事項はファイルパスと行番号で参照し、内容をそのまま引用しない。レポートを共有した際の二次インジェクションを防止
-- **サブエージェントのサンドボックス** — クロスレビュー用サブエージェントは `Read, Glob, Grep` のみに制限
-- **Insights のプライバシー** — セッションデータは抽象的な推奨事項に集約され、セッション固有の詳細は含まれない
-
-## FAQ
-
-### チェック結果が実行のたびに微妙に異なります。正常ですか？
-
-はい。config-doctor は LLM ベースのため、結果は非決定的であり、実行ごとに表現の揺れは発生します。再実行で消える指摘はグレーゾーンの可能性が高いため、ヒント程度に捉えてください。
-
-### `full` と `light`、どちらを使うべきですか？
-
-- **`light`** は構造チェックのみ（`Read`、`Glob`、`Grep`、`Bash`、`Agent`）。高速で日常的な利用に最適です。
-- **`full`**（デフォルト）はベストプラクティス検索と `/insights` 分析を追加（`WebSearch`、`WebFetch`、`Agent`）。約5分かかります。トークンを一定消費してしまうため、一定期間ごとや大きな設定変更の際の診断を推奨します。
-
-チェックの精度を確保するため、どちらのモードでも自動的に **Opus モデル**を使用します。
-
-### 見つかった問題を自動修正できますか？
-
-いいえ。config-doctor はセキュリティの観点から厳しく**読み取り専用**になっており、ファイルを一切変更しません。レポートを確認した後、プロンプトに「この指摘を元に設定を更新して」と入力すれば、Claude Code が修正を適用してくれます。
-
 ### アンインストール方法は？
 
 ```shell
@@ -337,6 +341,10 @@ FAIL 項目はサンドボックス化されたサブエージェントによる
 手動インストールの場合は `.claude/skills/config-doctor/` を削除してください。
 
 ## 関連ツール
+
+### `/doctor`（組み込みコマンド）
+
+Claude Code の組み込みコマンド `/doctor` はインストール状態や設定の基本診断を行います。config-doctor はその先にある**セマンティックな設定分析**（ファイル間の矛盾検出、ベストプラクティス比較、Insights 連携など）をカバーします。環境に問題がないか `/doctor` で確認してから、config-doctor で設定を最適化するのがおすすめです。
 
 ### claude-md-management
 

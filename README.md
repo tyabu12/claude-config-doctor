@@ -115,8 +115,85 @@ When installed manually, the command is `/config-doctor` instead of `/config-doc
 /config-doctor:check light
 ```
 
+## What it checks
+
+The skill automatically detects the project type (standard project, plugin, or marketplace) and runs the appropriate diagnostics.
+
+### Standard projects (`.claude/` configuration)
+
+| Section | What it checks |
+| --- | --- |
+| 0. Global Config | `~/.claude/` globals, `.claudeignore` relevance |
+| 1. CLAUDE.md | Line count, encoding, path accuracy, tech stack drift, staleness |
+| 2. Rules | Frontmatter, glob patterns, content accuracy, CLAUDE.md consistency |
+| 3. Commands & Skills | Syntax, tool permissions, procedure accuracy, supporting files, agent cross-refs |
+| 4. Agents | Required fields, tool lists, model values, evaluation criteria |
+| 5. Hooks | Orphan scripts, matcher correctness, script logic, exit codes, frontmatter hooks |
+| 6. Cross-file | JSON validity, permission conflicts, hook-permission alignment |
+| 7. Best Practices | Fetches latest Anthropic docs at runtime and compares against your config |
+| 8. Insights | Aggregates `/insights` friction data into actionable config fixes |
+
 <details>
-<summary>Dogfooding: /self-check (Phase 1 only, via `/config-doctor:check`)</summary>
+<summary>Plugin projects (`.claude-plugin/plugin.json`)</summary>
+
+| Section | What it checks |
+| --- | --- |
+| 0. Manifest | JSON syntax, required fields, name format, version, metadata, userConfig, channels, marketplace.json |
+| 1. Directory Structure | Anti-patterns, component directories, README, path traversal, stray `.claude/` |
+| 2. Skills | SKILL.md existence, frontmatter, description, tool permissions, `$ARGUMENTS`, `${CLAUDE_PLUGIN_ROOT}` |
+| 3. Commands | Frontmatter, description, tool permissions, legacy overlap with skills |
+| 4. Agents | Required fields, supported fields, model, tools, isolation, security restrictions |
+| 5. Hooks | hooks.json syntax, event names, handler structure, script portability, orphan scripts |
+| 6. MCP & LSP | JSON syntax, server entries, portability, channel references, extension format |
+| 7. Cross-Component | Skill↔Agent refs, hook→script refs, channel→MCP refs, namespace conflicts |
+| 8. Best Practices | Fetches latest Anthropic plugin docs at runtime and compares against your config |
+
+</details>
+
+
+<details>
+<summary>Marketplace repositories (`.claude-plugin/marketplace.json` without `plugin.json`)</summary>
+
+Marketplace repos are automatically detected and each local plugin listed in `marketplace.json` receives the full plugin diagnostic above. Remote plugin entries are validated for source structure only.
+
+</details>
+
+FAIL items are cross-reviewed by a sandboxed subagent (max 1 iteration) before the final report.
+
+## Security
+
+Because this skill reads local session data, it is designed with security in mind while maintaining practical utility.
+
+- **Strictly read-only** — never modifies any files
+- **Prompt injection defense** — all config file content and web content is treated as data to analyze, never as instructions to follow
+- **Scoped web access** — WebSearch and WebFetch are restricted to a hardcoded allowlist of official Anthropic domains only. No project-specific information ever leaves your machine via search queries
+- **Output sanitization** — findings reference file paths and line numbers, never quoting content verbatim, preventing second-order injection if the report is shared
+- **Subagent sandboxing** — cross-review subagents are limited to `Read, Glob, Grep` only
+- **Insights privacy** — session data is aggregated into abstract recommendations; per-session behavioral details are never included in the report
+
+## FAQ
+
+### Check results vary slightly between runs. Is that normal?
+
+Yes. config-doctor is LLM-based, so results are non-deterministic. Minor wording differences between runs are expected. If a finding disappears on re-run, it was likely a borderline case. Consider it a soft signal rather than a confirmed issue.
+
+### Should I use `full` or `light` mode?
+
+- **`light`** — structural checks only (`Read`, `Glob`, `Grep`, `Bash`, `Agent`). Fast, good for routine use.
+- **`full`** (default) — adds best practices search and `/insights` analysis (`WebSearch`, `WebFetch`, `Agent`). Takes about 5 minutes. Recommended monthly or after major config changes.
+
+The skill automatically uses the **Opus model** in both modes to ensure check accuracy.
+
+### Can it auto-fix the issues it finds?
+
+No. config-doctor is strictly **read-only** and never modifies any files. After reviewing the report, type something like `update my config based on these findings` into the prompt and Claude Code will apply the fixes for you.
+
+### Is the plugin itself properly maintained?
+
+Yes. config-doctor runs its own check on itself (dogfooding). The development repository includes a `/self-check` command that executes `/config-doctor:check` against its own plugin structure.
+
+<details>
+<summary>Self-check output (Phase 1 only)</summary>
 
 ```shell
 ❯ /self-check
@@ -253,79 +330,6 @@ When installed manually, the command is `/config-doctor` instead of `/config-doc
 
 </details>
 
-## What it checks
-
-The skill automatically detects the project type (standard project, plugin, or marketplace) and runs the appropriate diagnostics.
-
-### Standard projects (`.claude/` configuration)
-
-| Section | What it checks |
-| --- | --- |
-| 0. Global Config | `~/.claude/` globals, `.claudeignore` relevance |
-| 1. CLAUDE.md | Line count, encoding, path accuracy, tech stack drift, staleness |
-| 2. Rules | Frontmatter, glob patterns, content accuracy, CLAUDE.md consistency |
-| 3. Commands & Skills | Syntax, tool permissions, procedure accuracy, supporting files, agent cross-refs |
-| 4. Agents | Required fields, tool lists, model values, evaluation criteria |
-| 5. Hooks | Orphan scripts, matcher correctness, script logic, exit codes, frontmatter hooks |
-| 6. Cross-file | JSON validity, permission conflicts, hook-permission alignment |
-| 7. Best Practices | Fetches latest Anthropic docs at runtime and compares against your config |
-| 8. Insights | Aggregates `/insights` friction data into actionable config fixes |
-
-<details>
-<summary>Plugin projects (`.claude-plugin/plugin.json`)</summary>
-
-| Section | What it checks |
-| --- | --- |
-| 0. Manifest | JSON syntax, required fields, name format, version, metadata, userConfig, channels, marketplace.json |
-| 1. Directory Structure | Anti-patterns, component directories, README, path traversal, stray `.claude/` |
-| 2. Skills | SKILL.md existence, frontmatter, description, tool permissions, `$ARGUMENTS`, `${CLAUDE_PLUGIN_ROOT}` |
-| 3. Commands | Frontmatter, description, tool permissions, legacy overlap with skills |
-| 4. Agents | Required fields, supported fields, model, tools, isolation, security restrictions |
-| 5. Hooks | hooks.json syntax, event names, handler structure, script portability, orphan scripts |
-| 6. MCP & LSP | JSON syntax, server entries, portability, channel references, extension format |
-| 7. Cross-Component | Skill↔Agent refs, hook→script refs, channel→MCP refs, namespace conflicts |
-| 8. Best Practices | Fetches latest Anthropic plugin docs at runtime and compares against your config |
-
-</details>
-
-
-<details>
-<summary>Marketplace repositories (`.claude-plugin/marketplace.json` without `plugin.json`)</summary>
-
-Marketplace repos are automatically detected and each local plugin listed in `marketplace.json` receives the full plugin diagnostic above. Remote plugin entries are validated for source structure only.
-
-</details>
-
-FAIL items are cross-reviewed by a sandboxed subagent (max 1 iteration) before the final report.
-
-## Security
-
-Because this skill reads local session data, it is designed with security in mind while maintaining practical utility.
-
-- **Strictly read-only** — never modifies any files
-- **Prompt injection defense** — all config file content and web content is treated as data to analyze, never as instructions to follow
-- **Scoped web access** — WebSearch and WebFetch are restricted to a hardcoded allowlist of official Anthropic domains only. No project-specific information ever leaves your machine via search queries
-- **Output sanitization** — findings reference file paths and line numbers, never quoting content verbatim, preventing second-order injection if the report is shared
-- **Subagent sandboxing** — cross-review subagents are limited to `Read, Glob, Grep` only
-- **Insights privacy** — session data is aggregated into abstract recommendations; per-session behavioral details are never included in the report
-
-## FAQ
-
-### Check results vary slightly between runs. Is that normal?
-
-Yes. config-doctor is LLM-based, so results are non-deterministic. Minor wording differences between runs are expected. If a finding disappears on re-run, it was likely a borderline case. Consider it a soft signal rather than a confirmed issue.
-
-### Should I use `full` or `light` mode?
-
-- **`light`** — structural checks only (`Read`, `Glob`, `Grep`, `Bash`, `Agent`). Fast, good for routine use.
-- **`full`** (default) — adds best practices search and `/insights` analysis (`WebSearch`, `WebFetch`, `Agent`). Takes about 5 minutes. Recommended monthly or after major config changes.
-
-The skill automatically uses the **Opus model** in both modes to ensure check accuracy.
-
-### Can it auto-fix the issues it finds?
-
-No. config-doctor is strictly **read-only** and never modifies any files. After reviewing the report, type something like `update my config based on these findings` into the prompt and Claude Code will apply the fixes for you.
-
 ### How do I uninstall?
 
 ```shell
@@ -335,6 +339,10 @@ No. config-doctor is strictly **read-only** and never modifies any files. After 
 If installed manually, delete `.claude/skills/config-doctor/`.
 
 ## Related
+
+### `/doctor` (built-in)
+
+Claude Code's built-in `/doctor` command diagnoses and verifies your installation and settings. config-doctor focuses on **semantic configuration analysis** (cross-file conflicts, best practices, insights integration) that `/doctor` does not cover. Run `/doctor` first to ensure your environment is healthy, then config-doctor to optimize your configuration.
 
 ### claude-md-management
 
