@@ -115,144 +115,6 @@ When installed manually, the command is `/config-doctor` instead of `/config-doc
 /config-doctor:check light
 ```
 
-<details>
-<summary>Dogfooding: /self-check (Phase 1 only, via `/config-doctor:check`)</summary>
-
-```shell
-❯ /self-check
-
-  Claude Code Plugin Health Check
-
-  Date: 2026-04-01
-  Plugin: config-doctor
-  Reviewer: Claude Code /config-doctor:check
-  Review iterations: 0
-
-  Summary
-
-  ┌────────────────────────────────┬─────────────┬────────┐
-  │            Section             │   Status    │ Issues │
-  ├────────────────────────────────┼─────────────┼────────┤
-  │ 0. Manifest                    │ ✅ PASS     │ 0      │
-  ├────────────────────────────────┼─────────────┼────────┤
-  │ 1. Directory Structure         │ ⚠️  WARN     │ 1      │
-  ├────────────────────────────────┼─────────────┼────────┤
-  │ 2. Skills                      │ ✅ PASS     │ 0      │
-  ├────────────────────────────────┼─────────────┼────────┤
-  │ 3. Commands                    │ ⏭️  SKIPPED  │ 0      │
-  ├────────────────────────────────┼─────────────┼────────┤
-  │ 4. Agents                      │ ⏭️  SKIPPED  │ 0      │
-  ├────────────────────────────────┼─────────────┼────────┤
-  │ 5. Hooks                       │ ⏭️  SKIPPED  │ 0      │
-  ├────────────────────────────────┼─────────────┼────────┤
-  │ 6. MCP & LSP                   │ ⏭️  SKIPPED  │ 0      │
-  ├────────────────────────────────┼─────────────┼────────┤
-  │ 7. Cross-Component Consistency │ ✅ PASS     │ 0      │
-  ├────────────────────────────────┼─────────────┼────────┤
-  │ 8. Best Practices              │ ℹ️  ADVISORY │ 1      │
-  └────────────────────────────────┴─────────────┴────────┘
-
-  Section Details
-
-  0. Manifest Validation — ✅ PASS
-
-  plugin.json:
-  - JSON syntax: valid
-  - Required field name: present, non-empty string ("config-doctor")
-  - Name format: kebab-case — valid
-  - Version "1.1.0": valid semver
-  - Description: present, non-empty string
-  - Author: object with name field — valid
-  - Optional metadata: repository (valid URL string), license (string), keywords (array of strings) — all valid
-  - No component path overrides, userConfig, or channels defined
-  - No settings.json at plugin root
-  - No unknown top-level fields
-
-  marketplace.json:
-  - JSON syntax: valid
-  - Required fields: name, owner, plugins — all present
-  - Name format "tyabu12-claude-config-doctor": kebab-case — valid
-  - Owner: has name field — valid
-  - Metadata: description present (string) — valid
-  - Plugin entry: name "config-doctor" (kebab-case), source "./" (starts with ./, resolves to existing directory) — valid
-  - Description: present, non-empty string — valid
-  - Plugin name consistency: marketplace entry "config-doctor" matches plugin.json "config-doctor"; descriptions match
-  - No unknown top-level fields
-
-  1. Directory Structure — ⚠️  WARN (1)
-
-  - Anti-pattern check: .claude-plugin/ contains only plugin.json and marketplace.json — no component directories inside. PASS
-  - Component directories: skills/ exists at root with skill content. No commands/, agents/, hooks/, output-styles/, .mcp.json, or .lsp.json — expected for this plugin's scope
-  - README.md: exists at plugin root. PASS
-  - Path traversal: no component files reference paths outside the plugin root. PASS
-  - ⚠️  WARN: Stray .claude/ directory exists alongside .claude-plugin/. Contains settings.local.json (local dev permissions) and skills/self-check/ (development-only
-  self-diagnostics). CONTRIBUTING.md (lines 29–33) documents this as intentional. Documented — WARN acknowledged as expected.
-
-  2. Skills Validation — ✅ PASS
-
-  Skill: skills/check/ (self-skip rule overridden per /self-check instructions)
-
-  - SKILL.md exists: yes
-  - Frontmatter syntax: well-formed YAML
-  - description: present, ~195 characters (under 250 limit)
-  - allowed-tools: Read, Glob, Grep, WebSearch, WebFetch, Bash, Agent — all valid per reference.md
-  - model: opus — valid
-  - disable-model-invocation: true — valid boolean
-  - argument-hint: "[light | full]" — valid string
-  - Supporting files: plugin.md, project.md, reference.md — all referenced and all exist in the skill directory
-  - $ARGUMENTS usage: argument-hint is defined and $ARGUMENTS is referenced in SKILL.md and delegated procedure files
-  - Script references: none (no scripts to check)
-
-  3. Commands — ⏭️  SKIPPED
-
-  No commands/ directory exists.
-
-  4. Agents — ⏭️  SKIPPED
-
-  No agents/ directory exists.
-
-  5. Hooks — ⏭️  SKIPPED
-
-  No hooks/hooks.json, no inline hooks in plugin.json, no hooks/ directory.
-
-  6. MCP & LSP — ⏭️  SKIPPED
-
-  No .mcp.json, .lsp.json, or inline MCP/LSP config in plugin.json.
-
-  7. Cross-Component Consistency — ✅ PASS
-
-  - Skill→Agent references: none (no agents referenced)
-  - Command→Agent references: no commands
-  - Agent→Skill references: no agents
-  - Hook→Script references: no hooks
-  - Channel→MCP references: no channels
-  - Manifest→Component consistency: no custom component paths in manifest; default skills/ directory contains expected skill files
-  - Namespace consistency: only skills/ exists, no commands/ — no naming conflicts
-  - settings.json alignment: no settings.json at plugin root
-
-  8. Best Practices (Advisory) — ℹ️  ADVISORY (1)
-
-  Compared against official documentation from code.claude.com (plugins, plugins-reference, skills, hooks pages).
-
-  - Plugin structure: follows standard layout. PASS
-  - Skill vs command preference: uses skills/ directory (recommended). PASS
-  - Portability: no scripts or hardcoded paths — not applicable. PASS
-  - Validation support: claude plugin validate . is documented in CONTRIBUTING.md step 5. PASS
-  - ℹ️  ADVISORY: Official docs document newer plugin features including output styles (output-styles/), LSP servers (.lsp.json), channels, userConfig, and settings.json with
-  agent key for default agent activation. These are not relevant to this plugin's current scope but could be adopted if future development warrants them.
-
-  Sources: https://code.claude.com/docs/en/plugins-reference, https://code.claude.com/docs/en/plugins, https://code.claude.com/docs/en/skills,
-  https://code.claude.com/docs/en/hooks
-
-  Recommended Actions
-
-  1. [⚠️  WARN — Section 1] .claude/ directory exists alongside .claude-plugin/. Documented as intentional in CONTRIBUTING.md — no action needed unless the project structure
-  changes.
-  2. [ℹ️  ADVISORY — Section 8] Consider evaluating newer plugin features (output styles, LSP servers, channels, userConfig) if future development warrants them.
-```
-
-</details>
-
 ## What it checks
 
 The skill automatically detects the project type (standard project, plugin, or marketplace) and runs the appropriate diagnostics.
@@ -326,6 +188,151 @@ The skill automatically uses the **Opus model** in both modes to ensure check ac
 
 No. config-doctor is strictly **read-only** and never modifies any files. After reviewing the report, type something like `update my config based on these findings` into the prompt and Claude Code will apply the fixes for you.
 
+### Is the plugin itself properly maintained?
+
+Yes. config-doctor runs its own check on itself (dogfooding). The development repository includes a `/self-check` command that executes `/config-doctor:check` against its own plugin structure.
+
+<details>
+<summary>Self-check output (Phase 1 only)</summary>
+
+```shell
+❯ /self-check
+
+  Claude Code Plugin Health Check
+
+  Date: 2026-04-04
+  Plugin: config-doctor
+  Reviewer: Claude Code /config-doctor:check
+  Review iterations: 0
+
+  Summary
+
+  ┌────────────────────────────────┬─────────────┬────────┐
+  │            Section             │   Status    │ Issues │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 0. Manifest                    │ ✅ PASS     │ 0      │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 1. Directory Structure         │ ⚠️  WARN     │ 1      │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 2. Skills                      │ ✅ PASS     │ 0      │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 3. Commands                    │ ⏭️  SKIPPED  │ 0      │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 4. Agents                      │ ⏭️  SKIPPED  │ 0      │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 5. Hooks                       │ ⏭️  SKIPPED  │ 0      │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 6. MCP & LSP                   │ ⏭️  SKIPPED  │ 0      │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 7. Cross-Component Consistency │ ✅ PASS     │ 0      │
+  ├────────────────────────────────┼─────────────┼────────┤
+  │ 8. Best Practices              │ ℹ️  ADVISORY │ 2      │
+  └────────────────────────────────┴─────────────┴────────┘
+
+  Section Details
+
+  0. Manifest Validation — ✅ PASS
+
+  plugin.json:
+  - JSON syntax: valid
+  - Required field name: present, non-empty string ("config-doctor")
+  - Name format: kebab-case — valid
+  - Version "1.1.2": valid semver
+  - Description: present, non-empty string
+  - Author: object with name field — valid
+  - Optional metadata: repository (valid URL string), license (string), keywords (array of strings) — all valid
+  - No component path overrides, userConfig, or channels defined
+  - No settings.json at plugin root
+  - No unknown top-level fields
+
+  marketplace.json:
+  - JSON syntax: valid
+  - Required fields: name, owner, plugins — all present
+  - Name format "tyabu12-claude-config-doctor": kebab-case — valid
+  - Owner: has name field — valid
+  - Metadata: description present (string) — valid
+  - Plugin entry: name "config-doctor" (kebab-case), source "./" (starts with ./, resolves to existing directory) — valid
+  - Description: present, non-empty string — valid
+  - Plugin name consistency: marketplace entry "config-doctor" matches plugin.json "config-doctor"; descriptions match
+  - No unknown top-level fields
+
+  1. Directory Structure — ⚠️  WARN (1)
+
+  - Anti-pattern check: .claude-plugin/ contains only plugin.json and marketplace.json — no component directories inside. PASS
+  - Component directories: skills/ exists at root with skill content. No commands/, agents/, hooks/, output-styles/, .mcp.json, or .lsp.json — expected for this plugin's scope
+  - README.md: exists at plugin root. PASS
+  - Path traversal: no component files reference paths outside the plugin root. PASS
+  - ⚠️  WARN: Stray .claude/ directory exists alongside .claude-plugin/. Contains settings.local.json (local dev permissions) and skills/self-check/ (development-only
+  self-diagnostics). CONTRIBUTING.md (lines 41–48) documents this as intentional. Documented — WARN acknowledged as expected.
+
+  2. Skills Validation — ✅ PASS
+
+  Skill: skills/check/ (self-skip rule overridden per /self-check instructions)
+
+  - SKILL.md exists: yes
+  - Frontmatter syntax: well-formed YAML
+  - description: present, ~195 characters (under 250 limit)
+  - allowed-tools: Read, Glob, Grep, WebSearch, WebFetch, Bash, Agent — all valid per reference.md
+  - model: opus — valid
+  - disable-model-invocation: true — valid boolean
+  - argument-hint: "[light | full]" — valid string
+  - Supporting files: plugin.md, project.md, reference.md — all referenced and all exist in the skill directory
+  - $ARGUMENTS usage: argument-hint is defined and $ARGUMENTS is referenced in SKILL.md and delegated procedure files
+  - Script references: none (no scripts to check)
+
+  3. Commands — ⏭️  SKIPPED
+
+  No commands/ directory exists.
+
+  4. Agents — ⏭️  SKIPPED
+
+  No agents/ directory exists.
+
+  5. Hooks — ⏭️  SKIPPED
+
+  No hooks/hooks.json, no inline hooks in plugin.json, no hooks/ directory.
+
+  6. MCP & LSP — ⏭️  SKIPPED
+
+  No .mcp.json, .lsp.json, or inline MCP/LSP config in plugin.json.
+
+  7. Cross-Component Consistency — ✅ PASS
+
+  - Skill→Agent references: none (no agents referenced)
+  - Command→Agent references: no commands
+  - Agent→Skill references: no agents
+  - Hook→Script references: no hooks
+  - Channel→MCP references: no channels
+  - Manifest→Component consistency: no custom component paths in manifest; default skills/ directory contains expected skill files
+  - Namespace consistency: only skills/ exists, no commands/ — no naming conflicts
+  - settings.json alignment: no settings.json at plugin root
+
+  8. Best Practices (Advisory) — ℹ️  ADVISORY (2)
+
+  Compared against official documentation from code.claude.com (plugins, plugins-reference, skills, hooks pages).
+
+  - Plugin structure: follows standard layout. PASS
+  - Skill vs command preference: uses skills/ directory (recommended). PASS
+  - Portability: no scripts or hardcoded paths — not applicable. PASS
+  - Validation support: claude plugin validate . is documented in CONTRIBUTING.md step 5. PASS
+  - ℹ️  ADVISORY: reference.md is missing the PermissionDenied hook event, which is documented in the official plugins-reference page. This event fires when a tool call is denied
+  by the auto mode classifier.
+  - ℹ️  ADVISORY: Official docs document newer plugin features including output styles (output-styles/), LSP servers (.lsp.json), channels, userConfig, bin/ directory for
+  executables, and settings.json with agent key for default agent activation. These are not relevant to this plugin's current scope but could be adopted if future development
+  warrants them.
+
+  Sources: https://code.claude.com/docs/en/plugins-reference, https://code.claude.com/docs/en/plugins, https://code.claude.com/docs/en/skills
+
+  Recommended Actions
+
+  1. [⚠️  WARN — Section 1] .claude/ directory exists alongside .claude-plugin/. Documented as intentional in CONTRIBUTING.md — no action needed unless the project structure
+  changes.
+  2. [ℹ️  ADVISORY — Section 8] Add PermissionDenied to the valid hook event names in reference.md to match official documentation.
+  3. [ℹ️  ADVISORY — Section 8] Consider evaluating newer plugin features (output styles, LSP servers, channels, userConfig, bin/) if future development warrants them.
+```
+
+</details>
+
 ### How do I uninstall?
 
 ```shell
@@ -335,6 +342,10 @@ No. config-doctor is strictly **read-only** and never modifies any files. After 
 If installed manually, delete `.claude/skills/config-doctor/`.
 
 ## Related
+
+### `/doctor` (built-in)
+
+Claude Code's built-in `/doctor` command diagnoses and verifies your installation and settings. config-doctor focuses on **semantic configuration analysis** (cross-file conflicts, best practices, insights integration) that `/doctor` does not cover. Run `/doctor` first to ensure your environment is healthy, then config-doctor to optimize your configuration.
 
 ### claude-md-management
 
