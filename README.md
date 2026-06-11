@@ -200,7 +200,7 @@ Yes. config-doctor runs its own check on itself (dogfooding). The development re
 
   Claude Code Plugin Health Check
 
-  Date: 2026-04-04
+  Date: 2026-06-11
   Plugin: config-doctor
   Reviewer: Claude Code /config-doctor:check
   Review iterations: 0
@@ -212,7 +212,7 @@ Yes. config-doctor runs its own check on itself (dogfooding). The development re
   ├────────────────────────────────┼─────────────┼────────┤
   │ 0. Manifest                    │ ✅ PASS     │ 0      │
   ├────────────────────────────────┼─────────────┼────────┤
-  │ 1. Directory Structure         │ ⚠️  WARN     │ 1      │
+  │ 1. Directory Structure         │ ⚠️  WARN     │ 2      │
   ├────────────────────────────────┼─────────────┼────────┤
   │ 2. Skills                      │ ✅ PASS     │ 0      │
   ├────────────────────────────────┼─────────────┼────────┤
@@ -237,7 +237,7 @@ Yes. config-doctor runs its own check on itself (dogfooding). The development re
   - JSON syntax: valid
   - Required field name: present, non-empty string ("config-doctor")
   - Name format: kebab-case — valid
-  - Version "1.1.2": valid semver
+  - Version "1.1.3": valid semver
   - Description: present, non-empty string
   - Author: object with name field — valid
   - Optional metadata: repository (valid URL string), license (string), keywords (array of strings) — all valid
@@ -256,14 +256,16 @@ Yes. config-doctor runs its own check on itself (dogfooding). The development re
   - Plugin name consistency: marketplace entry "config-doctor" matches plugin.json "config-doctor"; descriptions match
   - No unknown top-level fields
 
-  1. Directory Structure — ⚠️  WARN (1)
+  1. Directory Structure — ⚠️  WARN (2)
 
   - Anti-pattern check: .claude-plugin/ contains only plugin.json and marketplace.json — no component directories inside. PASS
   - Component directories: skills/ exists at root with skill content. No commands/, agents/, hooks/, output-styles/, .mcp.json, or .lsp.json — expected for this plugin's scope
   - README.md: exists at plugin root. PASS
   - Path traversal: no component files reference paths outside the plugin root. PASS
   - ⚠️  WARN: Stray .claude/ directory exists alongside .claude-plugin/. Contains settings.local.json (local dev permissions) and skills/self-check/ (development-only
-  self-diagnostics). CONTRIBUTING.md (lines 41–48) documents this as intentional. Documented — WARN acknowledged as expected.
+  self-diagnostics). CONTRIBUTING.md (lines 45–50) documents this as intentional. Acknowledged as expected per CLAUDE.md.
+  - ⚠️  WARN: Procedure/documentation inconsistency. skills/check/plugin.md:90 instructs "If documented, report as PASS," but CONTRIBUTING.md:50 and CLAUDE.md describe the
+  diagnostic as flagging this WARN. The literal procedure yields PASS while the documented expectation is WARN — recommend reconciling the procedure wording with the docs.
 
   2. Skills Validation — ✅ PASS
 
@@ -271,7 +273,7 @@ Yes. config-doctor runs its own check on itself (dogfooding). The development re
 
   - SKILL.md exists: yes
   - Frontmatter syntax: well-formed YAML
-  - description: present, ~195 characters (under 250 limit)
+  - description: present, ~236 characters (under 250 limit)
   - allowed-tools: Read, Glob, Grep, WebSearch, WebFetch, Bash, Agent — all valid per reference.md
   - model: opus — valid
   - disable-model-invocation: true — valid boolean
@@ -324,9 +326,11 @@ Yes. config-doctor runs its own check on itself (dogfooding). The development re
 
   Recommended Actions
 
-  1. [⚠️  WARN — Section 1] .claude/ directory exists alongside .claude-plugin/. Documented as intentional in CONTRIBUTING.md — no action needed unless the project structure
+  1. [⚠️  WARN — Section 1] Reconcile the stray-.claude/ rating logic: skills/check/plugin.md:90 says "report as PASS" when documented, but CONTRIBUTING.md:50 and CLAUDE.md say
+  the diagnostic flags it WARN. Either update plugin.md:90 to keep WARN-with-justification, or update the two docs to reflect PASS-when-documented.
+  2. [⚠️  WARN — Section 1] .claude/ directory exists alongside .claude-plugin/. Documented as intentional in CONTRIBUTING.md — no action needed unless the project structure
   changes.
-  2. [ℹ️  ADVISORY — Section 8] Consider evaluating newer plugin features (output styles, LSP servers, channels, userConfig, bin/) if future development warrants them.
+  3. [ℹ️  ADVISORY — Section 8] Consider evaluating newer plugin features (output styles, LSP servers, channels, userConfig, bin/) if future development warrants them.
 ```
 
 </details>
