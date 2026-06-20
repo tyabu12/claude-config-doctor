@@ -1,5 +1,12 @@
 # 🩺 claude-config-doctor
 
+> [!IMPORTANT]
+> **このリポジトリはアーカイブ済みで、今後メンテナンスされません。**
+>
+> Claude Code には公式の [`claude-config-guide`](https://code.claude.com/docs/ja/sub-agents#other) エージェントが組み込まれ、最新のベストプラクティスを設定ファイルへ容易に反映できるようになりました。加えて、最近の Claude Code は設定ファイルを自力で十分に書けるようになっています。組み込みの [`/doctor`](https://code.claude.com/docs/ja/commands) 診断スキルもあり、本プロジェクトが担っていた役割はおおむね公式側に取り込まれました。これは当初からの狙いでもありました。🎉
+>
+> **今後は `claude-config-guide` と `/doctor` をご利用ください。** ここのコードは参考用に残しますが、更新は行いません。
+
 [English](./README.md)
 
 Claude Code の設定ファイル群のヘルスチェックを行う[スキル](https://code.claude.com/docs/ja/skills)です。
