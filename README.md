@@ -1,5 +1,12 @@
 # 🩺 claude-config-doctor
 
+> [!IMPORTANT]
+> **This repository is archived and no longer maintained.**
+>
+> Claude Code now ships with a built-in [`claude-config-guide`](https://code.claude.com/docs/en/sub-agents#other) agent that bakes the latest official best practices directly into your configuration, and modern Claude Code writes config files well on its own. Combined with the built-in [`/doctor`](https://code.claude.com/docs/en/commands) diagnostic, the niche this project filled has largely been absorbed upstream — which was the original goal. 🎉
+>
+> **Going forward, use `claude-config-guide` and `/doctor` instead.** The code here remains available for reference, but will not receive further updates.
+
 [日本語](./README.ja.md)
 
 A [skill](https://code.claude.com/docs/en/skills) that health-checks your Claude Code configuration files.
